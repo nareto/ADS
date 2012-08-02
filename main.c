@@ -1,6 +1,3 @@
-/*funkydodododo!*/
-/*hi there*/
-
 #include "hash.h"
 #include "graph.h"
 
