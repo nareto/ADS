@@ -63,6 +63,8 @@ void free_article(article * artcl);
 void free_author(author * athr);
 void article_print(article * artcl);
 void author_print(author * athr);
+void add_author_to_article(author * athr, article * artcl);
+void add_article_to_author(article * artcl, author * athr);
 
 /*LISTE*/
 list * new_list();
@@ -75,8 +77,6 @@ void list_print(list *l);
 
 /* /\* GRAFI *\/ */
 
-/* void add_author_to_article(author * athr, article * artcl);  */
-/* void add_article_to_author(article * artcl, author * athr); */
 /* article_graph * new_article_graph(void); */
 /* void article_graph_free(article_graph * gr, int deep); /\*if deep>0, free also the articles structs*\/ */
 /* void add_article_to_article_graph(article * article, article_graph * argr, list ** authors_dict); */

@@ -59,12 +59,23 @@ void author_print(author * athr){
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
-	printf("\n \t %s", ((article *) cur_node->key)->title);
+	printf("\n [%d] \t %s", ((article *) cur_node->key)->id, ((article *) cur_node->key)->title);
 	cur_node = cur_node->next;
       }
       printf("\n");
     }
   }
+}
+
+
+void add_author_to_article(author * the_author, article * the_article){
+  the_article->n_authors++;
+  list_insert(the_article->authors, the_author, author_node);
+}
+
+void add_article_to_author(article * the_article, author * the_author){
+  the_author->n_articles ++;
+  list_insert(the_author->articles, the_article, article_node);
 }
 
 /*LISTE*/
@@ -173,11 +184,9 @@ void list_print(list * the_list){
   while(cur_node != the_list->tail){
     switch(cur_node->n_type) {
     case article_node:
-      printf("\n article node\n");
       article_print(cur_node->key);
       break;
     case author_node:
-      printf("\n author node\n");
       author_print(cur_node->key);
       break;
     case other_node:
@@ -189,92 +198,8 @@ void list_print(list * the_list){
   printf("\n");
 }
 
-/* /\* LISTE - autori *\/ */
-/* author_list * author_list_new(){ */
-/*   author_list * the_list; */
-/*   author_node * dhead, *dtail; */
 
-/*   the_list = (author_list *) malloc(sizeof(author_list)); */
-
-/*   dhead = (author_node *) malloc(sizeof(author_node));   */
-/*   dtail = (author_node *) malloc(sizeof(author_node));   */
-
-/*   the_list->length = 0; */
- 
-/*   /\* dhead->key = new_author("list head",NULL,0,-1); *\/ */
-/*   /\* dtail->key = new_author("list tail",NULL,0,-1); *\/ */
-
-/*   dhead->next = dtail; */
-/*   dtail->prev = dhead; */
-
-/*   dhead->prev = NULL; */
-/*   dtail->next = NULL; */
-
-/*   the_list->head = dhead; */
-/*   the_list->tail = dtail; */
-
-/*   return the_list; */
-/* } */
-
-/* void author_list_free(author_list* the_list, int deep){ */
-/*   author_node * cur_author_node = the_list->head->next; */
-/*   author_node * next_author_node = cur_author_node->next; */
-
-/*   while(cur_author_node != the_list->tail){ */
-/*     if(deep > 0) */
-/*       author_free(cur_author_node->key); */
-/*     free(cur_author_node); */
-/*     cur_author_node = next_author_node; */
-/*     next_author_node = cur_author_node->next; */
-/*   } */
-/*   free(the_list->head); */
-/*   free(the_list->tail); */
-/*   free(the_list); */
-/* } */
-
-/* void author_list_insert_after(author_list * the_list, author_node *n, author * key) { */
-/*   author_node *new_author_node; */
-
-/*   new_author_node = (author_node *) malloc(sizeof(author_node)); */
-/*   new_author_node->key = key; */
-
-/*   ++the_list->length; */
-
-/*   n->next->prev = new_author_node; */
-/*   new_author_node->next = n->next; */
-
-/*   n->next = new_author_node; */
-/*   new_author_node->prev = n; */
-/* } */
-
-/* void author_list_insert(author_list * the_list, author * key){ */
-/*   author_list_insert_after(the_list, the_list->tail->prev, key); */
-/* } */
-
-/* void author_list_print(author_list * the_list){ */
-/*   author_node *cur_author_node; */
-/*   cur_author_node = the_list->head->next; */
-/*   while(cur_author_node != the_list->tail){ */
-/*     printf("\n %s \n",cur_author_node->key->name);  */
-/*     cur_author_node = cur_author_node->next; */
-/*   } */
-/*   printf("\n"); */
-/* } */
-
-/* /\* GRAFI *\/ */
-
-
-/* void add_author_to_article(author * the_author, article * the_article){ */
-/*   the_article->n_authors++; */
-/*   the_article->authors = (author **) realloc(the_article->authors, the_article->n_authors*sizeof(author *)); */
-/*   the_article->authors[the_article->n_authors - 1] = the_author; */
-/* } */
-
-/* void add_article_to_author(article * the_article, author * the_author){ */
-/*   the_author->n_articles ++; */
-/*   the_author->articles = (article **) realloc(the_author->articles, the_author->n_articles*sizeof(article *)); */
-/*   the_author->articles[the_author->n_articles - 1] = the_article; */
-/* } */
+/* GRAFI */
 
 /* article_graph * new_article_graph(void){ */
 /*   article_graph * argr; */
