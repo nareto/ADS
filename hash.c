@@ -1,3 +1,4 @@
+/*funkydodododo!*/
 #include "hash.h"
 
 int hashf(char * key, int modulo){
