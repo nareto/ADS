@@ -1,3 +1,4 @@
+/*funkydodododo!*/
 /*hi there*/
 
 #include "hash.h"

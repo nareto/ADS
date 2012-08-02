@@ -1,3 +1,4 @@
+/*funkydodododo!*/
 #include "graph.h"
 
 /* LISTE - articoli */
