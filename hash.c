@@ -1,3 +1,4 @@
+/*here we are again on master*/
 #include "hash.h"
 
 int hashf(char * key, int modulo){
