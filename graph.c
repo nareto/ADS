@@ -1,63 +1,70 @@
 #include "graph.h"
 
-article * new_article(char * the_title, author ** the_authors, int authors_count, int id){
+article * new_article(char * the_title, int id){
   article * artcl;
-  int i;
 
   artcl = (article *) malloc(sizeof(article));
-  artcl->n_authors = authors_count;
+  artcl->n_authors = 0;
   artcl->id = id;
- 
   artcl->title = (char *) malloc((1+strlen(the_title))*sizeof(char));
   strcpy(artcl->title, the_title);
-
-  artcl->authors = (author **) malloc(authors_count*sizeof(author *));
-  for(i=0;i<authors_count;i++){
-    artcl->authors[i] = the_authors[i];
-  }
-  
-  /* artcl->adj_list = (article_list *) malloc(sizeof(article_list)); */
-  /* artcl->adj_list = article_list_new(); */
+  artcl->authors = new_list();
 
   return artcl;
 }
 
-author * new_author(char * name, article ** articles, int articles_count, int id){
+author * new_author(char * name, int id){
   author * athr;
-  int i;
 
   athr = (author *) malloc(sizeof(author));
   athr->id = id;
-  athr->n_articles = articles_count;
-
+  athr->n_articles = 0;
   athr->name = (char *) malloc((1+strlen(name))*sizeof(char));
   strcpy(athr->name, name);
-
-  athr->articles = (article **) malloc(articles_count*sizeof(article *));
-  for(i=0;i<articles_count;i++)
-    athr->articles[i] = articles[i];
-  
+  athr->articles = new_list();
   return athr;
 }
 
-void article_print(article * artcl){
-  int i;
+void free_article(article * artcl){
+  free(artcl->title);
+  free(artcl->authors);
+  /* free(artcl->adj_list); */
+}
 
-  printf("\n Title: %s \n Authors: ", artcl->title);
-  for(i=0;i< artcl->n_authors;++i){
-    printf("%s, ", artcl->authors[i]->name);
+void free_author(author * athr){
+  free(athr->name);
+  free(athr->articles);
+}
+
+void article_print(article * artcl){
+  list_node * cur_node;
+  if(artcl != NULL){
+    printf("\n Title: %s \n Authors: ", artcl->title);
+    if(!list_is_empty(artcl->authors)){
+      cur_node = artcl->authors->head->next;
+      while(cur_node != artcl->authors->tail){
+	printf("%s, ", ((author *) cur_node->key)->name);
+	cur_node = cur_node->next;
+      }
+      printf("\n");
+    }  
   }
-  printf("\n");
 }
 
 void author_print(author * athr){
-  int i;
-  printf("\n Name: %s \n Articles (Co)authored:", athr->name);
-  for(i=0; i< athr->n_articles; ++i){
-    printf("\t %s\n", athr->articles[i]->title);
+  list_node * cur_node;
+
+  if(athr != NULL){
+    printf("\n Name: %s \n Articles (Co)authored:", athr->name);
+    if(!list_is_empty(athr->articles)){
+      cur_node = athr->articles->head->next;
+      while(cur_node != athr->articles->tail){
+	printf("\n \t %s", ((article *) cur_node->key)->title);
+	cur_node = cur_node->next;
+      }
+      printf("\n");
+    }
   }
-  /* printf("\n Other authors that wrote articles with %s:", athr->name); */
-  /* for */
 }
 
 /*LISTE*/
@@ -84,21 +91,62 @@ list * new_list(){
   return the_list;
 }
 
-/* void article_list_free(article_list* the_list, int deep){ */
-/*   article_node * cur_article_node = the_list->head->next; */
-/*   article_node * next_article_node = cur_article_node->next; */
+void free_list(list* the_list, int deep){
+  list_node * cur_node = the_list->head->next;
+  list_node * next_node = cur_node->next;
 
-/*   while(cur_article_node != the_list->tail){ */
-/*     if(deep > 0) */
-/*       article_free(cur_article_node->key); */
-/*     free(cur_article_node); */
-/*     cur_article_node = next_article_node; */
-/*     next_article_node = cur_article_node->next; */
-/*   } */
-/*   free(the_list->head); */
-/*   free(the_list->tail); */
-/*   free(the_list); */
-/* } */
+  while(cur_node != the_list->tail){
+    if(deep > 0){
+      switch(cur_node->n_type){
+      case article_node:
+	free_article(cur_node->key);
+	break;
+      case author_node:
+	free_author(cur_node->key);
+	break;
+      default:
+	break;
+      }
+    }
+      free(cur_node);
+      cur_node = next_node;
+      next_node = cur_node->next;
+  }
+  free(the_list->head);
+  free(the_list->tail);
+  free(the_list);
+}
+
+int list_is_empty(list *l){
+  if(l->head->next == l->tail)
+    return 1;
+  else
+    return 0;
+}
+
+void * is_in_list(list *l, node_type nt, char * string){
+  list_node * cur_node;
+  int j=0;
+ 
+  cur_node = l->head->next;
+  while(cur_node != l->tail){
+    switch(nt){
+    case article_node:    
+      if(strcmp(((article *) cur_node->key)->title,string) == 0)
+	return cur_node->key;
+      break;
+    case author_node:
+      if(strcmp(((author *) cur_node->key)->name,string) == 0)
+	return cur_node->key;   
+      break;
+    default:
+      return NULL;
+    }
+    cur_node = cur_node->next;
+    j++;
+  }
+  return NULL;
+}
 
 void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) {
   list_node *new_node;
@@ -184,21 +232,6 @@ void list_print(list * the_list){
 /*   free(the_list); */
 /* } */
 
-/* author * author_list_is_present(author_list *l, char * athr_name){ */
-/*   author_node * cur_node; */
-/*   int j=0; */
- 
-/*   cur_node = l->head->next; */
-/*   while(cur_node != l->tail){ */
-/*     /\* printf("\n curnode: %s \n athr: %s \n", cur_node->key->name, athr_name); *\/ */
-/*     if(strcmp(cur_node->key->name,athr_name) == 0) */
-/*       return cur_node->key; */
-/*     cur_node = cur_node->next; */
-/*     j++;   */
-/*   } */
-/*   return NULL; */
-/* } */
-
 /* void author_list_insert_after(author_list * the_list, author_node *n, author * key) { */
 /*   author_node *new_author_node; */
 
@@ -230,16 +263,6 @@ void list_print(list * the_list){
 
 /* /\* GRAFI *\/ */
 
-/* void article_free(article * artcl){ */
-/*   free(artcl->title); */
-/*   free(artcl->authors); */
-/*   /\* free(artcl->adj_list); *\/ */
-/* } */
-
-/* void author_free(author * athr){ */
-/*   free(athr->name); */
-/*   free(athr->articles); */
-/* } */
 
 /* void add_author_to_article(author * the_author, article * the_article){ */
 /*   the_article->n_authors++; */

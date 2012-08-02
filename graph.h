@@ -13,18 +13,19 @@
 typedef enum node_type_t {article_node, author_node, other_node} node_type;
 typedef struct article_t article; 
 typedef struct author_t author; 
+typedef struct list_t list;
 
 struct author_t {
   char * name;
   int id;
-  article ** articles;
+  list * articles;
   int n_articles;
 };
 
 struct article_t {
   char * title;
   int id;
-  author ** authors;
+  list * authors;
   /* list * adj_list; */
   int n_authors;
 };
@@ -37,10 +38,10 @@ typedef struct list_node_t {
   struct list_node_t *prev, *next;
 } list_node;
 
-typedef struct list_t {
+struct list_t {
   list_node * head, *tail;
   int length;
-} list;
+};
 
 /* GRAFI */
 /* typedef struct graph_node_t { */
@@ -56,22 +57,24 @@ typedef struct list_t {
 
 /* FUNCTIONS  */
 
-article * new_article(char * title, author ** authors, int authors_count, int id);
-author * new_author(char * name, article ** articles, int articles_count, int id);
+article * new_article(char * title, int id);
+author * new_author(char * name, int id);
+void free_article(article * artcl);
+void free_author(author * athr);
 void article_print(article * artcl);
 void author_print(author * athr);
 
 /*LISTE*/
 list * new_list();
-/* void free_list(list * l, int deep);/\*if the deep > 0 articles pointe to will also be freed*\/ */
-/* void * is_in_list(list *l, void * key); */
+void free_list(list * l, int deep);/*if the deep > 0 articles pointe to will also be freed*/
+int list_is_empty(list *l);
+void * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
 void list_insert_after(list * l, list_node * n, void * key, node_type nt);
 void list_insert(list *l, void * key, node_type nt);
 void list_print(list *l);
 
 /* /\* GRAFI *\/ */
-/* void article_free(article * artcl); */
-/* void author_free(author * athr); */
+
 /* void add_author_to_article(author * athr, article * artcl);  */
 /* void add_article_to_author(article * artcl, author * athr); */
 /* article_graph * new_article_graph(void); */
