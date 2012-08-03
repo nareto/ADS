@@ -67,6 +67,7 @@ void read_file(FILE * inputfile){
 	  cur_node = temp_author->articles->head->next;
 	  while(cur_node != temp_author->articles->tail){
 	    list_insert(temp_gnode->adj_list, temp_article, article_node);
+	    cur_node = cur_node->next;
 	  }
 	}
       }
