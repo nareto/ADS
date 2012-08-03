@@ -8,6 +8,7 @@ void graph_interface(void);
 int ati(char s[]);
 void flush_input_buffer(void);
 void remove_ending_newline(char * string);
+int line_is_blank(char * line);
 
 list * authors_dict[AUTHORS_HASH_DIM];
 graph * artcl_graph;
@@ -33,19 +34,21 @@ int main(int argc, char ** argv){
 }
 
 void read_file(FILE * inputfile){
-  char line[MAX_LINE_LENGTH];
+  char * line;
   int newline_to_title = 1, next_graph_node_id = 0, line_count = 0;
   article * temp_article;
   author * temp_author;
   graph_node * temp_gnode;
   list_node * cur_node;
+
+  line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
   fgets(line, MAX_LINE_LENGTH, inputfile);
-  while(strcmp(line, "\n") == 0)
+  while(line_is_blank(line))
     fgets(line, MAX_LINE_LENGTH, inputfile);
   while(line != NULL){
     ++line_count;
     /* remove_ending_newline(line); */
-    if(newline_to_title){
+    if(newline_to_title && !line_is_blank(line)){
       newline_to_title = 0;
       printf("\n article:: %s", line);
       temp_article = new_article(line);
@@ -53,7 +56,7 @@ void read_file(FILE * inputfile){
       ++next_graph_node_id;
     }
     else {
-      if(strcmp(line,"\n") == 0){
+      if(line_is_blank(line)){
 	newline_to_title = 1;
 	add_node_to_graph(temp_gnode, artcl_graph);
 	/* if(i>0) */
@@ -254,4 +257,22 @@ void remove_ending_newline(char * string){
   /*   string[strlen(string) - 1] = '\0'; */
   if( (ptr = strchr(string, '\n')) != NULL)
     *ptr = '\0';
+}
+
+int line_is_blank(char * line){
+  int i;
+
+  for(i=0; i < strlen(line) - 1;++i){
+    switch(line[i]) {
+    case '\n':
+      break;
+    case '\t':
+      break;
+    case ' ':
+      break;
+    default:
+      return 0;
+    }
+  }
+  return 1;
 }
