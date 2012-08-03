@@ -42,9 +42,9 @@ void read_file(FILE * inputfile){
   list_node * cur_node;
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
-  fgets(line, MAX_LINE_LENGTH, inputfile);
+  line = fgets(line, MAX_LINE_LENGTH, inputfile);
   while(line_is_blank(line))
-    fgets(line, MAX_LINE_LENGTH, inputfile);
+    line = fgets(line, MAX_LINE_LENGTH, inputfile);
   while(line != NULL){
     ++line_count;
     /* remove_ending_newline(line); */
@@ -79,7 +79,7 @@ void read_file(FILE * inputfile){
 	}
       }
     }
-    fgets(line, MAX_LINE_LENGTH, inputfile);  
+    line = fgets(line, MAX_LINE_LENGTH, inputfile);  
   }
   /* free(line); */
 }
