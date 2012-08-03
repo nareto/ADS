@@ -39,12 +39,15 @@ void read_file(FILE * inputfile){
   author * temp_author;
   graph_node * temp_gnode;
   list_node * cur_node;
-
-  while(fgets(line, MAX_LINE_LENGTH, inputfile) != NULL){
+  fgets(line, MAX_LINE_LENGTH, inputfile);
+  while(strcmp(line, "\n") == 0)
+    fgets(line, MAX_LINE_LENGTH, inputfile);
+  while(line != NULL){
     ++line_count;
     /* remove_ending_newline(line); */
     if(newline_to_title){
       newline_to_title = 0;
+      printf("\n article:: %s", line);
       temp_article = new_article(line);
       temp_gnode = new_graph_node(temp_article, article_node, next_graph_node_id);
       ++next_graph_node_id;
@@ -58,6 +61,7 @@ void read_file(FILE * inputfile){
       }
       else{
 	if((temp_author = is_in_list(authors_dict[hashf(line, AUTHORS_HASH_DIM)], author_node, line)) == NULL){
+	  printf("\n author:: %s", line);
 	  temp_author = new_author(line);
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
@@ -72,6 +76,7 @@ void read_file(FILE * inputfile){
 	}
       }
     }
+    fgets(line, MAX_LINE_LENGTH, inputfile);  
   }
   /* free(line); */
 }
