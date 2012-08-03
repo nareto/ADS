@@ -1,11 +1,10 @@
 #include "graph.h"
 
-article * new_article(char * the_title, int id){
+article * new_article(char * the_title){
   article * artcl;
 
   artcl = (article *) malloc(sizeof(article));
   artcl->n_authors = 0;
-  artcl->id = id;
   artcl->title = (char *) malloc((1+strlen(the_title))*sizeof(char));
   strcpy(artcl->title, the_title);
   artcl->authors = new_list();
@@ -13,11 +12,10 @@ article * new_article(char * the_title, int id){
   return artcl;
 }
 
-author * new_author(char * name, int id){
+author * new_author(char * name){
   author * athr;
 
   athr = (author *) malloc(sizeof(author));
-  athr->id = id;
   athr->n_articles = 0;
   athr->name = (char *) malloc((1+strlen(name))*sizeof(char));
   strcpy(athr->name, name);
@@ -39,7 +37,7 @@ void free_author(author * athr){
 void article_print(article * artcl){
   list_node * cur_node;
   if(artcl != NULL){
-    printf("\n Title: %s \n Authors: ", artcl->title);
+    printf("\n %7s: %s \n %7s: ", "Title", artcl->title, "Authors");
     if(!list_is_empty(artcl->authors)){
       cur_node = artcl->authors->head->next;
       while(cur_node != artcl->authors->tail){
@@ -59,7 +57,7 @@ void author_print(author * athr){
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
-	printf("\n [%d] \t %s", ((article *) cur_node->key)->id, ((article *) cur_node->key)->title);
+	printf("\n \t %s",  ((article *) cur_node->key)->title);
 	cur_node = cur_node->next;
       }
       printf("\n");
@@ -163,7 +161,17 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
   list_node *new_node;
 
   new_node = (list_node *) malloc(sizeof(list_node));
-  new_node->key = key;
+  switch (nt){
+  case article_node:
+    new_node->key = (article *) key;
+    break;
+  case author_node:
+    new_node->key = (author *) key;
+    break;
+  default:
+    new_node->key = key;
+    break;
+  } 
   new_node->n_type = nt;
   ++the_list->length;
 
@@ -201,39 +209,40 @@ void list_print(list * the_list){
 
 /* GRAFI */
 
-/* article_graph * new_article_graph(void){ */
-/*   article_graph * argr; */
+graph_node * new_graph_node(void * key, node_type nt, int id){
+  graph_node * gn;
 
-/*   argr = (article_graph *) malloc(sizeof(article_graph)); */
-/*   argr->articles = (article **) malloc(sizeof(article *)); */
-/*   argr->n_authors = 0; */
-/*   argr->n_articles = 0; */
+  gn = (graph_node *) malloc(sizeof(graph_node));
 
-/*   return argr; */
-/* } */
+  switch(nt) {
+  case author_node:
+    gn->key = (author *) key;
+    break;
+  case article_node:
+    gn->key = (article *) key;
+    break;
+  default:
+    gn->key = key;
+    break;
+  }
+  gn->adj_list = new_list();
+  gn->id = id;
 
-/* void article_graph_free(article_graph * argr, int deep){ */
-/*   int i; */
-/*   for(i=0; i < argr->n_articles; i++){ */
-/*     if(deep > 0) */
-/*       article_free(argr->articles[i]); */
-/*   } */
-/*   free(argr->articles); */
-/* } */
+  return gn;
+}
 
-/* void add_article_to_article_graph(article * the_article, article_graph *argr, author_list ** athdict){ */
-/*   int i,j; */
+graph * new_graph(void){
+  graph * g;
 
-/*   argr->n_articles ++; */
-/*   argr->articles = (article **) realloc(argr->articles, argr->n_articles*sizeof(article)); */
-/*   argr->articles[argr->n_articles -1] = the_article; */
+  g = (graph *) malloc(sizeof(graph));
+  g->nodes = (graph_node **) malloc(sizeof(graph_node *));
+  g->n_nodes = 0;
 
-/*   if(the_article->authors != NULL){ */
-/*     for(i=0;i< the_article->n_authors; ++i){ */
-/*       for(j=0; j < the_article->authors[i]->n_articles; ++j){ */
-/* 	article_list_insert(the_article->adj_list, the_article->authors[i]->articles[j]); */
-/* 	article_list_insert(the_article->authors[i]->articles[j]->adj_list, the_article); */
-/*       } */
-/*     } */
-/*   } */
-/* } */
+  return g;
+}
+
+void add_node_to_graph(graph_node * gn, graph * g){
+  g->n_nodes++;
+  g->nodes = realloc(g->nodes, g->n_nodes * sizeof(graph_node));
+  g->nodes[g->n_nodes - 1] = gn;
+}

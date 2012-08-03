@@ -4,14 +4,25 @@ int main(int argc, char ** argv){
   list * l;
   article * artcl1, * artcl2;
   author * athr1, *athr2,* athr3;
+  graph_node * gn1, * gn2;
+  graph * g;
+  int i;
 
   l = new_list();
-  artcl1 = new_article("pofferbacco",  0);
-  artcl2 = new_article("cazzarola porca",  1);
+  g = new_graph();
 
-  athr1 = new_author("tizio caio", 10);
-  athr2 = new_author("cazzo storto", 11);
-  athr3 = new_author("toio serba", 12);
+  artcl1 = new_article("pofferbacco");
+  artcl2 = new_article("cazzarola porca");
+
+  gn1 = new_graph_node(artcl1, article_node, 1);
+  gn2 = new_graph_node(artcl2, article_node, 2);
+
+  add_node_to_graph(gn1, g);
+  add_node_to_graph(gn2, g);
+
+  athr1 = new_author("tizio caio");
+  athr2 = new_author("cazzo storto");
+  athr3 = new_author("toio serba");
   
   add_author_to_article(athr1, artcl1);
   add_author_to_article(athr3, artcl1);
@@ -25,7 +36,11 @@ int main(int argc, char ** argv){
   /* printf("\n ---- \n"); */
   /* article_print(artcl2); */
 
-  list_print(artcl1->authors);
+  /* list_print(artcl1->authors); */
+
+  for(i=0; i < g->n_nodes; ++i)
+    article_print(g->nodes[i]->key);
+
   free_list(l,1);
   return 0;
 }

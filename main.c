@@ -10,7 +10,7 @@ void flush_input_buffer(void);
 void remove_ending_newline(char * string);
 
 list * authors_dict[AUTHORS_HASH_DIM];
-/* article_graph * artcl_gr; */
+graph * artcl_graph;
 
 int main(int argc, char ** argv){
   FILE * inputfile;
@@ -25,7 +25,7 @@ int main(int argc, char ** argv){
   for(i=0;i<AUTHORS_HASH_DIM;i++){
     authors_dict[i] = new_list();
   }
-  /* artcl_gr = new_article_graph(); */
+  artcl_graph = new_graph();
   read_file(inputfile);
   interface();
 
@@ -34,35 +34,41 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char line[MAX_LINE_LENGTH];
-  int i, newline_to_title = 1, next_author_id = 0, next_article_id = 0, line_count = 0;
+  int newline_to_title = 1, next_graph_node_id = 0, line_count = 0;
   article * temp_article;
   author * temp_author;
+  graph_node * temp_gnode;
+  list_node * cur_node;
 
   while(fgets(line, MAX_LINE_LENGTH, inputfile) != NULL){
     ++line_count;
     /* remove_ending_newline(line); */
     if(newline_to_title){
       newline_to_title = 0;
-      i = 0;
-      temp_article = new_article(line, next_article_id);
-      ++next_article_id;
+      temp_article = new_article(line);
+      temp_gnode = new_graph_node(temp_article, article_node, next_graph_node_id);
+      ++next_graph_node_id;
     }
     else {
       if(strcmp(line,"\n") == 0){
 	newline_to_title = 1;
-	/* add_article_to_article_graph(temp_article, artcl_gr, authors_dict); */
+	add_node_to_graph(temp_gnode, artcl_graph);
 	/* if(i>0) */
 	/*   free(temp_authors); */
       }
       else{
 	if((temp_author = is_in_list(authors_dict[hashf(line, AUTHORS_HASH_DIM)], author_node, line)) == NULL){
-	  temp_author = new_author(line, next_author_id);
+	  temp_author = new_author(line);
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
-	  ++next_author_id;
 	}
 	add_article_to_author(temp_article, temp_author);
 	add_author_to_article(temp_author, temp_article);
-	++i;
+	if(temp_author->articles->head->next != temp_author->articles->tail){
+	  cur_node = temp_author->articles->head->next;
+	  while(cur_node != temp_author->articles->tail){
+	    list_insert(temp_gnode->adj_list, temp_article, article_node);
+	  }
+	}
       }
     }
   }
