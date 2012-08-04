@@ -4,7 +4,7 @@
 #include <string.h>
 #include <openssl/md5.h>
 
-long int hashf(char * key, int modulo);
+unsigned long int hashf(char * key, int modulo);
 
 
 #endif
