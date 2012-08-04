@@ -5,7 +5,7 @@ void read_file(FILE * inputfile);
 void interface(void);
 void hash_interface(void);
 void graph_interface(void);
-int ati(char s[]);
+/* int ati(char s[]); */
 void flush_input_buffer(void);
 void remove_ending_newline(char * string);
 int line_is_blank(char * line);
@@ -117,7 +117,7 @@ void interface(){
       printf("\n do you want to free also the authors struct? (1=yes, 0=no): ");    
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
-      deep = ati(string);
+      deep = atoi(string);
       for(i=0;i<AUTHORS_HASH_DIM;i++)
 	free_list(authors_dict[i], deep);
       break;
@@ -125,7 +125,7 @@ void interface(){
       printf("\n do you want to free also the articles struct? (1=yes, 0=no): ");    
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
-      deep = ati(string);
+      deep = atoi(string);
       /* article_graph_free(artcl_gr, deep); */
       break;      
     case 'q':
@@ -225,14 +225,14 @@ void hash_interface(){
       printf("string to hash: ");
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
-      printf("\n %d\n", hashf(string, AUTHORS_HASH_DIM));
+      printf("\n %ld\n", hashf(string, AUTHORS_HASH_DIM));
       break;
     case 'p' :
       printf("cell number (default %d): ", cell_number);
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
       if(strcmp(string, "\n") != 0)
-	cell_number = ati(string);
+	cell_number = atoi(string);
       list_print(authors_dict[cell_number]);
       break;
     case 'd':
@@ -255,7 +255,7 @@ void hash_interface(){
       printf("set the number of authors a dot in the histogram corresponds to (default %d): ", unit);
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
-      unit = ati(string);
+      unit = atoi(string);
     case 'c':
       line_count = 0;
       for(i=0;i<AUTHORS_HASH_DIM;i++){
@@ -270,16 +270,16 @@ void hash_interface(){
   }
 }
 
-/* ati:  convert s to integer */
-int ati(char s[])
-{
-  int i, n;
+/* /\* ati:  convert s to integer *\/ */
+/* int ati(char s[]) */
+/* { */
+/*   int i, n; */
 
-  n = 0;
-  for (i = 0; s[i] >= '0' && s[i] <= '9'; ++i)
-    n = 10 * n + (s[i] - '0');
-  return n;
-}
+/*   n = 0; */
+/*   for (i = 0; s[i] >= '0' && s[i] <= '9'; ++i) */
+/*     n = 10 * n + (s[i] - '0'); */
+/*   return n; */
+/* } */
 
 void flush_input_buffer(void){
   char ch; 

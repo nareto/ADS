@@ -2,8 +2,9 @@
 #define _HASH_H_
 
 #include <string.h>
+#include <openssl/md5.h>
 
-int hashf(char * key, int modulo);
+long int hashf(char * key, int modulo);
 
 
 #endif
