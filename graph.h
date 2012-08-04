@@ -18,12 +18,14 @@ typedef struct list_t list;
 struct author_t {
   char * name;
   list * articles;
+  int id;
   int n_articles;
 };
 
 struct article_t {
   char * title;
   list * authors;
+  int id;
   int n_authors;
 };
 
@@ -43,6 +45,7 @@ struct list_t {
 typedef struct graph_node_t {
   void * key;
   node_type n_type;
+  int id; /* this must match the key's id*/
   list * adj_list;
 } graph_node;
 
@@ -52,8 +55,8 @@ typedef struct graph_t {
 } graph;
 
 /* FUNCTIONS  */
-article * new_article(char * title);
-author * new_author(char * name);
+article * new_article(char * title, int id);
+author * new_author(char * name, int id);
 void free_article(article * artcl);
 void free_author(author * athr);
 void article_print(article * artcl);

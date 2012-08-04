@@ -35,7 +35,8 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char * line;
-  int newline_to_title = 1, next_graph_node_id = 0, line_count = 0;
+  int newline_to_title = 1, line_count = 0;
+  unsigned int next_article_id = 0, next_author_id = 0;
   article * temp_article;
   author * temp_author;
   list_node * cur_node;
@@ -50,9 +51,9 @@ void read_file(FILE * inputfile){
     /* remove_ending_newline(line); */
     if(newline_to_title && !line_is_blank(line)){
       newline_to_title = 0;
-      temp_article = new_article(line);
+      temp_article = new_article(line, next_article_id);
       temp_gnode = new_graph_node(temp_article, article_node);
-      ++next_graph_node_id;
+      ++next_article_id;
     }
     else {
       if(line_is_blank(line)){
@@ -63,7 +64,8 @@ void read_file(FILE * inputfile){
       }
       else{
 	if((temp_author = is_in_list(authors_dict[hashf(line, AUTHORS_HASH_DIM)], author_node, line)) == NULL){
-	  temp_author = new_author(line);
+	  temp_author = new_author(line, next_author_id);
+	  ++next_author_id;
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
 	add_article_to_author(temp_article, temp_author);

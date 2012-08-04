@@ -1,6 +1,6 @@
 #include "graph.h"
 
-article * new_article(char * the_title){
+article * new_article(char * the_title, int id){
   article * artcl;
 
   artcl = (article *) malloc(sizeof(article));
@@ -8,11 +8,12 @@ article * new_article(char * the_title){
   artcl->title = (char *) malloc((1+strlen(the_title))*sizeof(char));
   strcpy(artcl->title, the_title);
   artcl->authors = new_list();
+  artcl->id = id;
 
   return artcl;
 }
 
-author * new_author(char * name){
+author * new_author(char * name, int id){
   author * athr;
 
   athr = (author *) malloc(sizeof(author));
@@ -20,6 +21,8 @@ author * new_author(char * name){
   athr->name = (char *) malloc((1+strlen(name))*sizeof(char));
   strcpy(athr->name, name);
   athr->articles = new_list();
+  athr->id = id;
+
   return athr;
 }
 
@@ -37,7 +40,7 @@ void free_author(author * athr){
 void article_print(article * artcl){
   list_node * cur_node;
   if(artcl != NULL){
-    printf("\n %7s: %s \n %7s: ", "Title", artcl->title, "Authors");
+    printf("\n %8s: %s \n %8s: %d \n %8s: ", "Title", artcl->title,"Id", artcl->id, "Authors");
     if(!list_is_empty(artcl->authors)){
       cur_node = artcl->authors->head->next;
       while(cur_node != artcl->authors->tail){
@@ -53,7 +56,7 @@ void author_print(author * athr){
   list_node * cur_node;
 
   if(athr != NULL){
-    printf("\n Name: %s \n Articles (Co)authored:", athr->name);
+    printf("\n %8s: %s \n %8s: %d \n %8s: ", "Name", athr->name, "Id", athr->id, "Articles");
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
@@ -217,9 +220,11 @@ graph_node * new_graph_node(void * key, node_type nt){
   switch(nt) {
   case author_node:
     gn->key = (author *) key;
+    gn->id = ((author *) gn->key)->id;
     break;
   case article_node:
     gn->key = (article *) key;
+    gn->id = ((article *) gn->key)->id;
     break;
   default:
     gn->key = key;
