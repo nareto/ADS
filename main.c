@@ -48,8 +48,8 @@ void read_file(FILE * inputfile){
     line = fgets(line, MAX_LINE_LENGTH, inputfile);
   while(line != NULL){
     ++line_count;
-    /* remove_ending_newline(line); */
     if(newline_to_title && !line_is_blank(line)){
+      remove_ending_newline(line);
       newline_to_title = 0;
       temp_article = new_article(line, next_article_id);
       temp_gnode = new_graph_node(temp_article, article_node);
@@ -63,6 +63,7 @@ void read_file(FILE * inputfile){
 	/*   free(temp_authors); */
       }
       else{
+	remove_ending_newline(line);
 	if((temp_author = is_in_list(authors_dict[hashf(line, AUTHORS_HASH_DIM)], author_node, line)) == NULL){
 	  temp_author = new_author(line, next_author_id);
 	  ++next_author_id;
