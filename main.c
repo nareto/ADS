@@ -48,7 +48,7 @@ void read_file(FILE * inputfile){
     line = fgets(line, MAX_LINE_LENGTH, inputfile);
   while(line != NULL){
     ++line_count;
-    if(newline_to_title && !line_is_blank(line)){
+    if(newline_to_title && !line_is_blank(line)){ /*a new article/authors block begins*/
       remove_ending_newline(line);
       newline_to_title = 0;
       temp_article = new_article(line, next_article_id);
@@ -56,11 +56,9 @@ void read_file(FILE * inputfile){
       ++next_article_id;
     }
     else {
-      if(line_is_blank(line)){
+      if(line_is_blank(line)){ /*we have just terminated processing an article/authors block */
 	newline_to_title = 1;
 	add_node_to_graph(temp_gnode, artcl_graph);
-	/* if(i>0) */
-	/*   free(temp_authors); */
       }
       else{
 	remove_ending_newline(line);
@@ -69,18 +67,15 @@ void read_file(FILE * inputfile){
 	  ++next_author_id;
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
-	add_article_to_author(temp_article, temp_author);
-	add_author_to_article(temp_author, temp_article);
-	if(temp_author->n_articles > 1){
 	  cur_node = temp_author->articles->head->next;
 	  while(cur_node != temp_author->articles->tail){
-	    if((article *) cur_node != temp_article){
-	      list_insert(temp_gnode->adj_list, temp_article, article_node);
-	      /* list_insert(temp_gnode->adj_list, temp_article, article_node); */
-	    }
+	    list_insert(temp_gnode->adj_list, cur_node->key, article_node);
+	    if(((article *) cur_node->key)->id < next_article_id - 1)
+	      list_insert(artcl_graph->nodes[((article *) cur_node ->key)->id]->adj_list, temp_article, article_node);
 	    cur_node = cur_node->next;
 	  }
-	}
+	  add_article_to_author(temp_article, temp_author);
+	  add_author_to_article(temp_author, temp_article);
       }
     }
     line = fgets(line, MAX_LINE_LENGTH, inputfile);  
@@ -133,7 +128,7 @@ void interface(){
 void graph_interface(){
   char input, string[MAX_LINE_LENGTH];
   author * athr;
-  /* list_node * cur_node; */
+  list_node * cur_node;
   int end=0, i;
 
   while(!end){
@@ -148,6 +143,7 @@ void graph_interface(){
       printf("\n Author name: ");
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
+      remove_ending_newline(string);
       athr = is_in_list(authors_dict[hashf(string, AUTHORS_HASH_DIM)], author_node, string);
       if(athr == NULL)
 	printf("\n sorry, author not present \n");
@@ -155,23 +151,23 @@ void graph_interface(){
 	author_print(athr);
       break;
     case 'A':
-      printf("\n Article number in the graph: ");
+      printf("\n Article Id: ");
       flush_input_buffer();
       scanf("%d", &i);
-      /* article_print(artcl_gr->articles[i]); */
+      article_print(artcl_graph->nodes[i]->key);
       break;
     case 'n':
-      printf("\n Article number in the graph: ");
+      printf("\n Article Id: ");
       flush_input_buffer();
       scanf("%d", &i);
       /* printf("\n Max distance in which to look for neighboors: "); */
       /* flush_input_buffer(); */
       /* scanf("%d", &j); */
-      /* cur_node = artcl_gr->articles[i]->adj_list->head->next; */
-      /* while(cur_node != artcl_gr->articles[i]->adj_list->tail){ */
-      /* 	article_print(cur_node->key); */
-      /* 	cur_node = cur_node->next; */
-      /* } */
+      cur_node = artcl_graph->nodes[i]->adj_list->head->next;
+      while(cur_node != artcl_graph->nodes[i]->adj_list->tail){
+      	article_print(((article *) cur_node->key));
+      	cur_node = cur_node->next;
+      }
       break;      
     case 'q':
       end=1;

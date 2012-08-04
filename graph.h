@@ -50,7 +50,7 @@ typedef struct graph_node_t {
 } graph_node;
 
 typedef struct graph_t {
-  graph_node ** nodes;
+  graph_node ** nodes; /*this should hold: nodes[n]->id == n*/
   int n_nodes;
 } graph;
 
@@ -61,6 +61,8 @@ void free_article(article * artcl);
 void free_author(author * athr);
 void article_print(article * artcl);
 void author_print(author * athr);
+void article_short_print(article * artcl);
+void author_short_print(author * athr);
 void add_author_to_article(author * athr, article * artcl);
 void add_article_to_author(article * artcl, author * athr);
 

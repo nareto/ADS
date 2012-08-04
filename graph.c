@@ -44,7 +44,8 @@ void article_print(article * artcl){
     if(!list_is_empty(artcl->authors)){
       cur_node = artcl->authors->head->next;
       while(cur_node != artcl->authors->tail){
-	printf("\n %8s: %s, ", "Author", ((author *) cur_node->key)->name);
+	/* printf("\n %8s: %s, ", "Author", ((author *) cur_node->key)->name); */
+	author_short_print((author *) cur_node->key);
 	cur_node = cur_node->next;
       }
       printf("\n");
@@ -60,7 +61,8 @@ void author_print(author * athr){
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
-	printf("\n %8s: %s",  "Article", ((article *) cur_node->key)->title);
+	/* printf("\n %8s: %s",  "Article", ((article *) cur_node->key)->title); */
+	article_short_print((article *) cur_node->key);
 	cur_node = cur_node->next;
       }
       printf("\n");
@@ -68,6 +70,20 @@ void author_print(author * athr){
   }
 }
 
+
+void article_short_print(article * artcl){
+
+  if(artcl != NULL){
+    printf("\n %8s: %d, %s", "Id, Title", artcl->id, artcl->title);
+  }
+}
+
+void author_short_print(author * athr){
+
+  if(athr != NULL){
+    printf("\n %8s: %d, %s", "Id, Name",  athr->id, athr->name);
+  }
+}
 
 void add_author_to_article(author * the_author, article * the_article){
   the_article->n_authors++;
