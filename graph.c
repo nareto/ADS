@@ -1,4 +1,3 @@
-#define PPRINT 1
 #include "graph.h"
 
 article * new_article(char * the_title, int id){
@@ -42,9 +41,9 @@ void article_print(article * artcl){
   list_node * cur_node;
   if(artcl != NULL){
     if(PPRINT)
-      printf("\n %8s %s \n %8s %d", "\033[1mTitle:\033[0m", artcl->title,"\033[1mId:\033[0m", artcl->id);
+      printf("\n %10s %s \n %10s %d", "\033[1;33mTitle:\033[0m", artcl->title,"\033[1;33mId:\033[0m", artcl->id);
     else
-      printf("\n %8s: %s \n %8s: %d", "Title", artcl->title,"Id", artcl->id);
+      printf("\n %10s: %s \n %10s: %d", "Title", artcl->title,"Id", artcl->id);
     if(!list_is_empty(artcl->authors)){
       cur_node = artcl->authors->head->next;
       while(cur_node != artcl->authors->tail){
@@ -61,9 +60,9 @@ void author_print(author * athr){
 
   if(athr != NULL){
     if(PPRINT)
-      printf("\n %8s %s \n %8s %d", "\033[1mName:\033[0m", athr->name, "\033[1mId:\033[0m", athr->id);
+      printf("\n %10s %s \n %10s %d", "\033[1;33mName:\033[0m", athr->name, "\033[1;33mId:\033[0m", athr->id);
     else
-      printf("\n %8s: %s \n %8s: %d", "Name", athr->name, "Id", athr->id);
+      printf("\n %10s: %s \n %10s: %d", "Name", athr->name, "Id", athr->id);
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
@@ -80,9 +79,9 @@ void article_short_print(article * artcl){
 
   if(artcl != NULL){
     if(PPRINT)
-      printf("\n %8s %d, %s", "\033[1mId, Title:\033[0m", artcl->id, artcl->title);
+      printf("\n %10s %d, %s", "\033[1;33mId, Title:\033[0m", artcl->id, artcl->title);
     else
-      printf("\n %8s: %d, %s", "Id, Title", artcl->id, artcl->title);
+      printf("\n %10s: %d, %s", "Id, Title", artcl->id, artcl->title);
   }
 }
 
@@ -90,9 +89,9 @@ void author_short_print(author * athr){
 
   if(athr != NULL){
     if(PPRINT)
-      printf("\n %8s %d, %s", "\033[1mId, Name:\033[0m",  athr->id, athr->name);
+      printf("\n %10s %d, %s", "\033[1;33mId, Name:\033[0m",  athr->id, athr->name);
     else
-      printf("\n %8s: %d, %s", "Id, Name",  athr->id, athr->name);
+      printf("\n %10s: %d, %s", "Id, Name",  athr->id, athr->name);
   }
 }
 

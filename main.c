@@ -89,12 +89,22 @@ void interface(){
   char string[MAX_LINE_LENGTH];
 
   while(!end){
-    printf("\n \033[1;33mCommands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
-	   "\033[1;32mh\033[0m", "hash table submenu",
-	   "\033[1;32mg\033[0m", "graph submenu",
-	   "\033[1;32mf\033[0m", "free all the lists in the authors hash table",
-	   "\033[1;32mF\033[0m", "free the article graph",
-	   "\033[1;32mq\033[0m", "quit");
+    if(PPRINT){
+      printf("\n \033[1;31mCommands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	     "\033[1;32mh\033[0m", "hash table submenu",
+	     "\033[1;32mg\033[0m", "graph submenu",
+	     "\033[1;32mf\033[0m", "free all the lists in the authors hash table",
+	     "\033[1;32mF\033[0m", "free the article graph",
+	     "\033[1;32mq\033[0m", "quit");
+    }
+    else{
+      printf("\n Commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	     "h", "hash table submenu",
+	     "g", "graph submenu",
+	     "f", "free all the lists in the authors hash table",
+	     "F", "free the article graph",
+	     "q", "quit");
+    }
     scanf(" %c", &input);
     switch (input) {
     case 'h':
@@ -132,11 +142,20 @@ void graph_interface(){
   int end=0, i;
 
   while(!end){
-    printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
-	   "a", "print an author and its articles",
-	   "A", "print an article and its authors",
-	   "n", "print an article and its neighbors in the article graph",
-	   "q", "return to main menu");
+    if(PPRINT){
+      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	     "\033[1;32ma\033[0m", "print an author and its articles",
+	     "\033[1;32mA\033[0m", "print an article and its authors",
+	     "\033[1;32mn\033[0m", "print an article and its neighbors in the article graph",
+	     "\033[1;32mq\033[0m", "return to main menu");
+    }
+    else{
+      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	     "a", "print an author and its articles",
+	     "A", "print an article and its authors",
+	     "n", "print an article and its neighbors in the article graph",
+	     "q", "return to main menu");
+    }
     scanf(" %c", &input);
     switch(input) {
     case 'a':
@@ -181,14 +200,24 @@ void hash_interface(){
   char input, string[MAX_LINE_LENGTH];
   
   while(!end){
-    printf("\n Hash Table commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
-	   "h", "calculate the hash of a string",
-	   "p", "print the list in a hash cell",
-	   "d", "print a histogram of the collisions in the hash table",
-	   "s", "set the units for the histogram",
-	   "c", "print line count (add up the hash's table lists lenghts)",
-	   "q", "return to main menu");
-
+    if(PPRINT){
+      printf("\n \033[1;31mHash Table commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	     "\033[1;32mh\033[0m", "calculate the hash of a string",
+	     "\033[1;32mp\033[0m", "print the list in a hash cell",
+	     "\033[1;32md\033[0m", "print a histogram of the collisions in the hash table",
+	     "\033[1;32ms\033[0m", "set the units for the histogram",
+	     "\033[1;32mc\033[0m", "print line count (add up the hash's table lists lenghts)",
+	     "\033[1;32mq\033[0m", "return to main menu");
+    }
+    else{
+      printf("\n Hash Table commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	     "h", "calculate the hash of a string",
+	     "p", "print the list in a hash cell",
+	     "d", "print a histogram of the collisions in the hash table",
+	     "s", "set the units for the histogram",
+	     "c", "print line count (add up the hash's table lists lenghts)",
+	     "q", "return to main menu");
+    }
     scanf(" %c", &input);
 
     switch (input) {
@@ -208,12 +237,19 @@ void hash_interface(){
       break;
     case 'd':
       for(i = 0; i< AUTHORS_HASH_DIM; i++){
-	printf("%d:",i);
+
+	if(PPRINT)
+	  printf("\033[1m%d:\033[0m",i);
+	else
+	  printf("%d:",i);	  
 	for(j=0; j< authors_dict[i]->length; j = j + unit)
-	  printf(".");
+	  if(PPRINT)
+	    printf("\033[1;33m*\033[0m");
+	  else
+	    printf("*");
 	printf("\n");
       }
-      printf("\n a dot corresponds to %d elements\n", unit);
+      printf("\n a star corresponds to %d elements\n", unit);
       break;
     case 's':
       printf("set the number of authors a dot in the histogram corresponds to (default %d): ", unit);

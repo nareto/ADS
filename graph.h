@@ -1,12 +1,14 @@
 #ifndef _GRAPH_H
 #define _GRAPH_H
 
+#define PPRINT 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "hash.h"
 
-#define AUTHORS_HASH_DIM 1001
+#define AUTHORS_HASH_DIM 100001
 #define MAX_LINE_LENGTH 1000
 
 /* STRUCTS */
