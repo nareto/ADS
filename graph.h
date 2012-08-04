@@ -6,7 +6,7 @@
 #include <string.h>
 #include "hash.h"
 
-#define AUTHORS_HASH_DIM 10001
+#define AUTHORS_HASH_DIM 1001
 #define MAX_LINE_LENGTH 1000
 
 /* STRUCTS */
@@ -43,7 +43,6 @@ struct list_t {
 typedef struct graph_node_t {
   void * key;
   node_type n_type;
-  int id;
   list * adj_list;
 } graph_node;
 
@@ -68,11 +67,11 @@ void free_list(list * l, int deep);/*if the deep > 0 articles pointed to will al
 int list_is_empty(list *l);
 void * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
 void list_insert_after(list * l, list_node * n, void * key, node_type nt);
-void list_insert(list *l, void * key, node_type nt);
+void list_insert(list *l, void * key, node_type nt); /*inserts at the end of the list*/
 void list_print(list *l);
 
 /* GRAFI */
-graph_node * new_graph_node(void * key, node_type nt, int id);
+graph_node * new_graph_node(void * key, node_type nt);
 graph * new_graph(void);
 void add_node_to_graph(graph_node * gn, graph * g);
 /* article_graph * new_article_graph(void); */

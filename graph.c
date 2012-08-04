@@ -209,7 +209,7 @@ void list_print(list * the_list){
 
 /* GRAFI */
 
-graph_node * new_graph_node(void * key, node_type nt, int id){
+graph_node * new_graph_node(void * key, node_type nt){
   graph_node * gn;
 
   gn = (graph_node *) malloc(sizeof(graph_node));
@@ -226,7 +226,6 @@ graph_node * new_graph_node(void * key, node_type nt, int id){
     break;
   }
   gn->adj_list = new_list();
-  gn->id = id;
 
   return gn;
 }

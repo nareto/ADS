@@ -38,8 +38,8 @@ void read_file(FILE * inputfile){
   int newline_to_title = 1, next_graph_node_id = 0, line_count = 0;
   article * temp_article;
   author * temp_author;
-  graph_node * temp_gnode;
   list_node * cur_node;
+  graph_node * temp_gnode;
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
   line = fgets(line, MAX_LINE_LENGTH, inputfile);
@@ -50,9 +50,8 @@ void read_file(FILE * inputfile){
     /* remove_ending_newline(line); */
     if(newline_to_title && !line_is_blank(line)){
       newline_to_title = 0;
-      printf("\n article:: %s", line);
       temp_article = new_article(line);
-      temp_gnode = new_graph_node(temp_article, article_node, next_graph_node_id);
+      temp_gnode = new_graph_node(temp_article, article_node);
       ++next_graph_node_id;
     }
     else {
@@ -64,16 +63,18 @@ void read_file(FILE * inputfile){
       }
       else{
 	if((temp_author = is_in_list(authors_dict[hashf(line, AUTHORS_HASH_DIM)], author_node, line)) == NULL){
-	  printf("\n author:: %s", line);
 	  temp_author = new_author(line);
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
 	add_article_to_author(temp_article, temp_author);
 	add_author_to_article(temp_author, temp_article);
-	if(temp_author->articles->head->next != temp_author->articles->tail){
+	if(temp_author->n_articles > 1){
 	  cur_node = temp_author->articles->head->next;
 	  while(cur_node != temp_author->articles->tail){
-	    list_insert(temp_gnode->adj_list, temp_article, article_node);
+	    if((article *) cur_node != temp_article){
+	      list_insert(temp_gnode->adj_list, temp_article, article_node);
+	      /* list_insert(temp_gnode->adj_list, temp_article, article_node); */
+	    }
 	    cur_node = cur_node->next;
 	  }
 	}
