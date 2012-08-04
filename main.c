@@ -1,3 +1,4 @@
+#define PPRINT 1
 #include "hash.h"
 #include "graph.h"
 
