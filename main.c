@@ -1,4 +1,3 @@
-#define PPRINT 1
 #include "hash.h"
 #include "graph.h"
 
@@ -90,12 +89,12 @@ void interface(){
   char string[MAX_LINE_LENGTH];
 
   while(!end){
-    printf("\n Commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
-	   "h", "hash table submenu",
-	   "g", "graph submenu",
-	   "f", "free all the lists in the authors hash table",
-	   "F", "free the article graph",
-	   "q", "quit");
+    printf("\n \033[1;33mCommands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+	   "\033[1;32mh\033[0m", "hash table submenu",
+	   "\033[1;32mg\033[0m", "graph submenu",
+	   "\033[1;32mf\033[0m", "free all the lists in the authors hash table",
+	   "\033[1;32mF\033[0m", "free the article graph",
+	   "\033[1;32mq\033[0m", "quit");
     scanf(" %c", &input);
     switch (input) {
     case 'h':

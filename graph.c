@@ -1,3 +1,4 @@
+#define PPRINT 1
 #include "graph.h"
 
 article * new_article(char * the_title, int id){
@@ -40,11 +41,13 @@ void free_author(author * athr){
 void article_print(article * artcl){
   list_node * cur_node;
   if(artcl != NULL){
-    printf("\n %8s: %s \n %8s: %d", "Title", artcl->title,"Id", artcl->id);
+    if(PPRINT)
+      printf("\n %8s %s \n %8s %d", "\033[1mTitle:\033[0m", artcl->title,"\033[1mId:\033[0m", artcl->id);
+    else
+      printf("\n %8s: %s \n %8s: %d", "Title", artcl->title,"Id", artcl->id);
     if(!list_is_empty(artcl->authors)){
       cur_node = artcl->authors->head->next;
       while(cur_node != artcl->authors->tail){
-	/* printf("\n %8s: %s, ", "Author", ((author *) cur_node->key)->name); */
 	author_short_print((author *) cur_node->key);
 	cur_node = cur_node->next;
       }
@@ -57,11 +60,13 @@ void author_print(author * athr){
   list_node * cur_node;
 
   if(athr != NULL){
-    printf("\n %8s: %s \n %8s: %d", "Name", athr->name, "Id", athr->id);
+    if(PPRINT)
+      printf("\n %8s %s \n %8s %d", "\033[1mName:\033[0m", athr->name, "\033[1mId:\033[0m", athr->id);
+    else
+      printf("\n %8s: %s \n %8s: %d", "Name", athr->name, "Id", athr->id);
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
-	/* printf("\n %8s: %s",  "Article", ((article *) cur_node->key)->title); */
 	article_short_print((article *) cur_node->key);
 	cur_node = cur_node->next;
       }
@@ -74,14 +79,20 @@ void author_print(author * athr){
 void article_short_print(article * artcl){
 
   if(artcl != NULL){
-    printf("\n %8s: %d, %s", "Id, Title", artcl->id, artcl->title);
+    if(PPRINT)
+      printf("\n %8s %d, %s", "\033[1mId, Title:\033[0m", artcl->id, artcl->title);
+    else
+      printf("\n %8s: %d, %s", "Id, Title", artcl->id, artcl->title);
   }
 }
 
 void author_short_print(author * athr){
 
   if(athr != NULL){
-    printf("\n %8s: %d, %s", "Id, Name",  athr->id, athr->name);
+    if(PPRINT)
+      printf("\n %8s %d, %s", "\033[1mId, Name:\033[0m",  athr->id, athr->name);
+    else
+      printf("\n %8s: %d, %s", "Id, Name",  athr->id, athr->name);
   }
 }
 
