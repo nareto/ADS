@@ -40,11 +40,11 @@ void free_author(author * athr){
 void article_print(article * artcl){
   list_node * cur_node;
   if(artcl != NULL){
-    printf("\n %8s: %s \n %8s: %d \n %8s: ", "Title", artcl->title,"Id", artcl->id, "Authors");
+    printf("\n %8s: %s \n %8s: %d", "Title", artcl->title,"Id", artcl->id);
     if(!list_is_empty(artcl->authors)){
       cur_node = artcl->authors->head->next;
       while(cur_node != artcl->authors->tail){
-	printf("%s, ", ((author *) cur_node->key)->name);
+	printf("\n %8s: %s, ", "Author", ((author *) cur_node->key)->name);
 	cur_node = cur_node->next;
       }
       printf("\n");
@@ -56,11 +56,11 @@ void author_print(author * athr){
   list_node * cur_node;
 
   if(athr != NULL){
-    printf("\n %8s: %s \n %8s: %d \n %8s: ", "Name", athr->name, "Id", athr->id, "Articles");
+    printf("\n %8s: %s \n %8s: %d", "Name", athr->name, "Id", athr->id);
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head->next;
       while(cur_node != athr->articles->tail){
-	printf("\n \t %s",  ((article *) cur_node->key)->title);
+	printf("\n %8s: %s",  "Article", ((article *) cur_node->key)->title);
 	cur_node = cur_node->next;
       }
       printf("\n");
