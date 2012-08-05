@@ -27,6 +27,7 @@ int main(int argc, char ** argv){
   }
   artcl_graph = new_graph();
   read_file(inputfile);
+  fclose(inputfile);
   interface();
 
   return 0;
@@ -158,7 +159,7 @@ void graph_interface(){
     scanf(" %c", &input);
     switch(input) {
     case 'a':
-      printf("\n Author name: ");
+      printf("\n Author Name: ");
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
       remove_ending_newline(string);
