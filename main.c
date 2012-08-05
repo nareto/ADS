@@ -143,17 +143,19 @@ void graph_interface(){
 
   while(!end){
     if(PPRINT){
-      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "\033[1;32ma\033[0m", "print an author and its articles",
 	     "\033[1;32mA\033[0m", "print an article and its authors",
 	     "\033[1;32mn\033[0m", "print an article and its neighbors in the article graph",
+	     "\033[1;32mc\033[0m", "print the article count (number of nodes in graph)",
 	     "\033[1;32mq\033[0m", "return to main menu");
     }
     else{
-      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "a", "print an author and its articles",
 	     "A", "print an article and its authors",
 	     "n", "print an article and its neighbors in the article graph",
+	     "c", "print the article count (number of nodes in graph)",
 	     "q", "return to main menu");
     }
     scanf(" %c", &input);
@@ -184,7 +186,10 @@ void graph_interface(){
       	article_print(((article *) cur_node->key));
       	cur_node = cur_node->next;
       }
-      break;      
+      break;    
+    case 'c':
+      printf("\n %d Articles", artcl_graph->n_nodes);
+      break;
     case 'q':
       end=1;
       break;
@@ -193,7 +198,7 @@ void graph_interface(){
 }
 
 void hash_interface(){
-  int i, j, line_count = 0, end = 0, unit = 100, cell_number = 0;
+  int i, j, author_count = 0, end = 0, unit = 100, cell_number = 0;
   char input, string[MAX_LINE_LENGTH];
   
   while(!end){
@@ -212,7 +217,7 @@ void hash_interface(){
 	     "p", "print the list in a hash cell",
 	     "d", "print a histogram of the collisions in the hash table",
 	     "s", "set the units for the histogram",
-	     "c", "print line count (add up the hash's table lists lenghts)",
+	     "c", "print the authors count (add up the hash's table lists lenghts)",
 	     "q", "return to main menu");
     }
     scanf(" %c", &input);
@@ -254,11 +259,11 @@ void hash_interface(){
       fgets(string, MAX_LINE_LENGTH, stdin);
       unit = atoi(string);
     case 'c':
-      line_count = 0;
+      author_count = 0;
       for(i=0;i<AUTHORS_HASH_DIM;i++){
-	line_count = line_count + authors_dict[i]->length;
+	author_count = author_count + authors_dict[i]->length;
       }
-      printf("\n %d lines \n", line_count);
+      printf("\n %d lines \n", author_count);
       break;
     case 'q':
       end = 1;
