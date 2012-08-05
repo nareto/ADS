@@ -5,7 +5,6 @@ void read_file(FILE * inputfile);
 void interface(void);
 void hash_interface(void);
 void graph_interface(void);
-/* int ati(char s[]); */
 void flush_input_buffer(void);
 void remove_ending_newline(char * string);
 int line_is_blank(char * line);
@@ -80,7 +79,7 @@ void read_file(FILE * inputfile){
     }
     line = fgets(line, MAX_LINE_LENGTH, inputfile);  
   }
-  /* free(line); */
+  free(line);
 }
 
 void interface(){
@@ -179,9 +178,6 @@ void graph_interface(){
       printf("\n Article Id: ");
       flush_input_buffer();
       scanf("%d", &i);
-      /* printf("\n Max distance in which to look for neighboors: "); */
-      /* flush_input_buffer(); */
-      /* scanf("%d", &j); */
       cur_node = artcl_graph->nodes[i]->adj_list->head->next;
       while(cur_node != artcl_graph->nodes[i]->adj_list->tail){
       	article_print(((article *) cur_node->key));
@@ -270,17 +266,6 @@ void hash_interface(){
   }
 }
 
-/* /\* ati:  convert s to integer *\/ */
-/* int ati(char s[]) */
-/* { */
-/*   int i, n; */
-
-/*   n = 0; */
-/*   for (i = 0; s[i] >= '0' && s[i] <= '9'; ++i) */
-/*     n = 10 * n + (s[i] - '0'); */
-/*   return n; */
-/* } */
-
 void flush_input_buffer(void){
   char ch; 
 
@@ -289,8 +274,7 @@ void flush_input_buffer(void){
 
 void remove_ending_newline(char * string){
   char * ptr;
-  /* if(strcmp(&string[strlen(string) - 1], "\n") == 0) */
-  /*   string[strlen(string) - 1] = '\0'; */
+
   if( (ptr = strchr(string, '\n')) != NULL)
     *ptr = '\0';
 }

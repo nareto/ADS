@@ -28,13 +28,12 @@ author * new_author(char * name, int id){
 
 void free_article(article * artcl){
   free(artcl->title);
-  free(artcl->authors);
-  /* free(artcl->adj_list); */
-}
+  free_list(artcl->authors, 0);
+ }
 
 void free_author(author * athr){
   free(athr->name);
-  free(athr->articles);
+  free_list(athr->articles,0);
 }
 
 void article_print(article * artcl){
