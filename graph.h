@@ -47,7 +47,7 @@ typedef struct graph_node_t {
   void * key;
   node_type n_type;
   int id; /* this must match the key's id*/
-  int n_neighbours;
+  unsigned int n_neighbours;
   struct graph_node_t ** neighbours;
 } graph_node;
 
@@ -81,6 +81,7 @@ void list_print(list *l);
 /* GRAFI */
 graph_node * new_graph_node(void * key, node_type nt);
 void free_graph_node(graph_node *gn, int deep);/*if deep>0 free the key also*/
+int is_arc(graph_node * gn1, graph_node * gn2);
 void add_arc(graph_node * gn1, graph_node *gn2);
 
 graph * new_graph(void);

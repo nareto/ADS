@@ -35,7 +35,7 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char * line;
-  int newline_to_title = 1, line_count = 0;
+  int newline_to_title = 1, line_count = 1;
   unsigned int next_article_id = 0, next_author_id = 0;
   article * temp_article;
   author * temp_author;
@@ -72,7 +72,7 @@ void read_file(FILE * inputfile){
 	while(cur_node != temp_author->articles->tail){
 	  /* if(((article *) cur_node->key)->id < next_article_id - 1) */
 	  if((article *) cur_node->key != temp_article)
-	    add_arc(temp_gnode, artcl_graph->nodes[((article *) cur_node ->key)->id]);
+	    add_arc(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]);
 	  cur_node = cur_node->next;
 	}
 	add_article_to_author(temp_article, temp_author);
@@ -187,7 +187,7 @@ void graph_interface(){
       /* 	cur_node = cur_node->next; */
       /* } */
       for(j=0;j<artcl_graph->nodes[i]->n_neighbours; ++j)
-	article_print((article *) artcl_graph->nodes[i]->key);
+	article_print((article *) artcl_graph->nodes[i]->neighbours[j]->key);
       break;    
     case 'c':
       printf("\n %d Articles", artcl_graph->n_nodes);

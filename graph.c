@@ -298,15 +298,26 @@ void free_graph_node(graph_node *gn, int deep){
   free(gn->neighbours);
 }
 
+int is_arc(graph_node * gn1, graph_node * gn2){
+  int i;
+  for(i=0;i<gn1->n_neighbours;++i){
+    if(gn1->neighbours[i] == gn2)
+      return 1;
+  }
+  return 0;
+}
+
 void add_arc(graph_node *gn1, graph_node *gn2){
-  gn1->n_neighbours++;
-  gn2->n_neighbours++;
+  if(!is_arc(gn1,gn2)){
+    gn1->n_neighbours++;
+    gn2->n_neighbours++;
 
-  gn1->neighbours = (graph_node **) realloc(gn1->neighbours, gn1->n_neighbours*sizeof(graph_node *));
-  gn2->neighbours = (graph_node **) realloc(gn2->neighbours, gn2->n_neighbours*sizeof(graph_node *));
+    gn1->neighbours = (graph_node **) realloc(gn1->neighbours, gn1->n_neighbours*sizeof(graph_node *));
+    gn2->neighbours = (graph_node **) realloc(gn2->neighbours, gn2->n_neighbours*sizeof(graph_node *));
 
-  gn1->neighbours[gn1->n_neighbours - 1] = gn2;
-  gn2->neighbours[gn2->n_neighbours - 1] = gn1;
+    gn1->neighbours[gn1->n_neighbours - 1] = gn2;
+    gn2->neighbours[gn2->n_neighbours - 1] = gn1;
+  }
 }
 
 graph * new_graph(void){
@@ -330,6 +341,6 @@ void free_graph(graph *g, int deep){
 
 void add_node_to_graph(graph_node * gn, graph * g){
   g->n_nodes++;
-  g->nodes = realloc(g->nodes, g->n_nodes * sizeof(graph_node));
+  g->nodes = (graph_node **) realloc(g->nodes, g->n_nodes * sizeof(graph_node *));
   g->nodes[g->n_nodes - 1] = gn;
 }
