@@ -48,7 +48,7 @@ typedef struct graph_node_t {
   node_type n_type;
   int id; /* this must match the key's id*/
   int n_neighbours;
-  graph_node ** neighbours;
+  struct graph_node_t ** neighbours;
 } graph_node;
 
 typedef struct graph_t {

@@ -130,18 +130,18 @@ list * new_list(){
 
 void free_list_node(list_node *ln, int deep){
   if(deep > 0){
-    switch(cur_node->n_type){
+    switch(ln->n_type){
     case article_node:
-      free_article(cur_node->key);
+      free_article(ln->key);
       break;
     case author_node:
-      free_author(cur_node->key);
+      free_author(ln->key);
       break;
     default:
       break;
     }
   }
-  free(cur_node);
+  free(ln);
 }
 
 void free_list(list* the_list, int deep){
@@ -258,6 +258,7 @@ graph_node * new_graph_node(void * key, node_type nt){
     break;
   }
   gn->neighbours = (graph_node **) malloc(sizeof(graph_node *)); 
+  gn->n_neighbours = 0;
 
   return gn;
 }
@@ -282,7 +283,7 @@ void free_graph_node(graph_node *gn, int deep){
   if(deep>0){
     for(i=0; i < gn->n_neighbours; ++i){
       temp_gn = gn->neighbours[i];
-      switch(temp-gn->n_type){
+      switch(temp_gn->n_type){
       case article_node:
 	free_article(temp_gn->key);
 	break;
