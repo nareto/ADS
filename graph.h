@@ -47,7 +47,8 @@ typedef struct graph_node_t {
   void * key;
   node_type n_type;
   int id; /* this must match the key's id*/
-  list * adj_list;
+  int n_neighbours;
+  graph_node ** neighbours;
 } graph_node;
 
 typedef struct graph_t {
@@ -69,7 +70,8 @@ void add_article_to_author(article * artcl, author * athr);
 
 /*LISTE*/
 list * new_list(void);
-void free_list(list * l, int deep);/*if the deep > 0 articles pointed to will also be freed*/
+void free_list_node(list_node * ln, int deep);/*if deep>0 free the key also*/
+void free_list(list * l, int deep);/*if the deep > 0 free nodes' keys also*/
 int list_is_empty(list *l);
 void * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
 void list_insert_after(list * l, list_node * n, void * key, node_type nt);
@@ -78,9 +80,11 @@ void list_print(list *l);
 
 /* GRAFI */
 graph_node * new_graph_node(void * key, node_type nt);
+void free_graph_node(graph_node *gn, int deep);/*if deep>0 free the key also*/
+void add_arc(graph_node * gn1, graph_node *gn2);
+
 graph * new_graph(void);
+void free_graph(graph * g, int deep); /*if deep>0 free nodes' keys also*/
 void add_node_to_graph(graph_node * gn, graph * g);
-/* article_graph * new_article_graph(void); */
-/* void article_graph_free(article_graph * gr, int deep); /\*if deep>0, free also the articles structs*\/ */
-/* void add_article_to_article_graph(article * article, article_graph * argr, list ** authors_dict); */
+
 #endif

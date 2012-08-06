@@ -67,15 +67,16 @@ void read_file(FILE * inputfile){
 	  ++next_author_id;
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
-	  cur_node = temp_author->articles->head->next;
-	  while(cur_node != temp_author->articles->tail){
-	    list_insert(temp_gnode->adj_list, cur_node->key, article_node);
-	    if(((article *) cur_node->key)->id < next_article_id - 1)
-	      list_insert(artcl_graph->nodes[((article *) cur_node ->key)->id]->adj_list, temp_article, article_node);
-	    cur_node = cur_node->next;
-	  }
-	  add_article_to_author(temp_article, temp_author);
-	  add_author_to_article(temp_author, temp_article);
+	/*properly update the article's arcs in the graph*/
+	cur_node = temp_author->articles->head->next;
+	while(cur_node != temp_author->articles->tail){
+	  list_insert(temp_gnode->adj_list, cur_node->key, article_node);
+	  if(((article *) cur_node->key)->id < next_article_id - 1)
+	    list_insert(artcl_graph->nodes[((article *) cur_node ->key)->id]->adj_list, temp_article, article_node);
+	  cur_node = cur_node->next;
+	}
+	add_article_to_author(temp_article, temp_author);
+	add_author_to_article(temp_author, temp_article);
       }
     }
     line = fgets(line, MAX_LINE_LENGTH, inputfile);  

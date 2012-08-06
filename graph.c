@@ -128,26 +128,28 @@ list * new_list(){
   return the_list;
 }
 
+void free_list_node(list_node *ln, int deep){
+  if(deep > 0){
+    switch(cur_node->n_type){
+    case article_node:
+      free_article(cur_node->key);
+      break;
+    case author_node:
+      free_author(cur_node->key);
+      break;
+    default:
+      break;
+    }
+  }
+  free(cur_node);
+}
+
 void free_list(list* the_list, int deep){
   list_node * cur_node = the_list->head->next;
-  list_node * next_node = cur_node->next;
 
   while(cur_node != the_list->tail){
-    if(deep > 0){
-      switch(cur_node->n_type){
-      case article_node:
-	free_article(cur_node->key);
-	break;
-      case author_node:
-	free_author(cur_node->key);
-	break;
-      default:
-	break;
-      }
-    }
-      free(cur_node);
-      cur_node = next_node;
-      next_node = cur_node->next;
+    free_list_node(cur_node, deep);
+    cur_node = cur_node->next;
   }
   free(the_list->head);
   free(the_list->tail);
@@ -255,9 +257,55 @@ graph_node * new_graph_node(void * key, node_type nt){
     gn->key = key;
     break;
   }
-  gn->adj_list = new_list();
+  gn->neighbours = (graph_node **) malloc(sizeof(graph_node *)); 
 
   return gn;
+}
+
+void free_graph_node(graph_node *gn, int deep){
+  int i;
+  graph_node * temp_gn;
+
+  if(deep > 0){
+    switch(gn->n_type){
+    case article_node:
+      free_article(gn->key);
+      break;
+    case author_node:
+      free_author(gn->key);
+      break;
+    default:
+      break;
+    }
+  }
+    
+  if(deep>0){
+    for(i=0; i < gn->n_neighbours; ++i){
+      temp_gn = gn->neighbours[i];
+      switch(temp-gn->n_type){
+      case article_node:
+	free_article(temp_gn->key);
+	break;
+      case author_node:
+	free_author(temp_gn->key);
+	break;
+      default:
+	break;
+      }
+    }
+  }
+  free(gn->neighbours);
+}
+
+void add_arc(graph_node *gn1, graph_node *gn2){
+  gn1->n_neighbours++;
+  gn2->n_neighbours++;
+
+  gn1->neighbours = (graph_node **) realloc(gn1->neighbours, gn1->n_neighbours*sizeof(graph_node *));
+  gn2->neighbours = (graph_node **) realloc(gn2->neighbours, gn2->n_neighbours*sizeof(graph_node *));
+
+  gn1->neighbours[gn1->n_neighbours - 1] = gn2;
+  gn2->neighbours[gn2->n_neighbours - 1] = gn1;
 }
 
 graph * new_graph(void){
@@ -268,6 +316,15 @@ graph * new_graph(void){
   g->n_nodes = 0;
 
   return g;
+}
+
+void free_graph(graph *g, int deep){
+  int i;
+
+  for(i=0; i< g->n_nodes; ++i){
+    free_graph_node(g->nodes[i], deep);
+  }
+  free(g);
 }
 
 void add_node_to_graph(graph_node * gn, graph * g){
