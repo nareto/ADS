@@ -68,21 +68,25 @@ void read_file(FILE * inputfile){
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
 	/*properly update the article's arcs in the graph*/
-	cur_node = temp_author->articles->head->next;
-	while(cur_node != temp_author->articles->tail){
-	  /* if(((article *) cur_node->key)->id < next_article_id - 1) */
-	  if((article *) cur_node->key != temp_article)
-	    add_arc(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]);
-	  cur_node = cur_node->next;
-	}
-	add_article_to_author(temp_article, temp_author);
-	add_author_to_article(temp_author, temp_article);
+	if(!list_is_empty(temp_author->articles)){
+	    cur_node = temp_author->articles->head;
+	    while(1){
+	      /* if(((article *) cur_node->key)->id < next_article_id - 1) */
+	      if((article *) cur_node->key != temp_article)
+		add_arc(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]);
+	      if(cur_node == temp_author->articles->tail)
+		break;
+	      cur_node = cur_node->next;
+	    }
+	  }
+	  add_article_to_author(temp_article, temp_author);
+	  add_author_to_article(temp_author, temp_article);
+	  }
       }
+      line = fgets(line, MAX_LINE_LENGTH, inputfile);  
     }
-    line = fgets(line, MAX_LINE_LENGTH, inputfile);  
+    free(line);
   }
-  free(line);
-}
 
 void interface(){
   char input;

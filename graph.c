@@ -44,9 +44,11 @@ void article_print(article * artcl){
     else
       printf("\n %10s: %s \n %10s: %d", "Title", artcl->title,"Id", artcl->id);
     if(!list_is_empty(artcl->authors)){
-      cur_node = artcl->authors->head->next;
-      while(cur_node != artcl->authors->tail){
+      cur_node = artcl->authors->head;
+      while(1){
 	author_short_print((author *) cur_node->key);
+	if(cur_node == artcl->authors->tail)
+	  break;
 	cur_node = cur_node->next;
       }
       printf("\n");
@@ -63,10 +65,13 @@ void author_print(author * athr){
     else
       printf("\n %10s: %s \n %10s: %d", "Name", athr->name, "Id", athr->id);
     if(!list_is_empty(athr->articles)){
-      cur_node = athr->articles->head->next;
-      while(cur_node != athr->articles->tail){
+      cur_node = athr->articles->head;
+      while(1){
 	article_short_print((article *) cur_node->key);
+	if(cur_node == athr->articles->tail)
+	  break;
 	cur_node = cur_node->next;
+
       }
       printf("\n");
     }
@@ -107,24 +112,21 @@ void add_article_to_author(article * the_article, author * the_author){
 /*LISTE*/
 list * new_list(){
   list * the_list;
-  list_node * dhead, *dtail;
+  list_node * head;
 
   the_list = (list *) malloc(sizeof(list));
 
-  dhead = (list_node *) malloc(sizeof(list_node));
-  dtail = (list_node *) malloc(sizeof(list_node));
+  head = (list_node *) malloc(sizeof(list_node));
+  head->key = NULL;
+  head->prev = NULL;
+  head->next = NULL;
+  head->n_type = empty_node;
 
+  the_list->head = head;
+  the_list->tail = head;
+  
   the_list->length = 0;
  
-  dhead->next = dtail;
-  dtail->prev = dhead;
-
-  dhead->prev = NULL;
-  dtail->next = NULL;
-
-  the_list->head = dhead;
-  the_list->tail = dtail;
-
   return the_list;
 }
 
@@ -145,19 +147,20 @@ void free_list_node(list_node *ln, int deep){
 }
 
 void free_list(list* the_list, int deep){
-  list_node * cur_node = the_list->head->next;
+  list_node * cur_node = the_list->head;
 
-  while(cur_node != the_list->tail){
-    free_list_node(cur_node, deep);
+  while(1){
+    if(cur_node == the_list->tail)
+      break;
     cur_node = cur_node->next;
+    free_list_node(cur_node->prev, deep);
   }
-  free(the_list->head);
   free(the_list->tail);
   free(the_list);
 }
 
 int list_is_empty(list *l){
-  if(l->head->next == l->tail)
+  if(l->head == l->tail && l->head->n_type == empty_node)
     return 1;
   else
     return 0;
@@ -167,22 +170,26 @@ void * is_in_list(list *l, node_type nt, char * string){
   list_node * cur_node;
   int j=0;
  
-  cur_node = l->head->next;
-  while(cur_node != l->tail){
-    switch(nt){
-    case article_node:    
-      if(strcmp(((article *) cur_node->key)->title,string) == 0)
-	return cur_node->key;
-      break;
-    case author_node:
-      if(strcmp(((author *) cur_node->key)->name,string) == 0)
-	return cur_node->key;   
-      break;
-    default:
-      return NULL;
+  cur_node = l->head;
+  if(!list_is_empty(l)){
+    while(1){
+      switch(nt){
+      case article_node:    
+	if(strcmp(((article *) cur_node->key)->title,string) == 0)
+	  return cur_node->key;
+	break;
+      case author_node:
+	if(strcmp(((author *) cur_node->key)->name,string) == 0)
+	  return cur_node->key;   
+	break;
+      default:
+	return NULL;
+      }
+      if(cur_node == l->tail)
+	return NULL;
+      cur_node = cur_node->next;
+      j++;
     }
-    cur_node = cur_node->next;
-    j++;
   }
   return NULL;
 }
@@ -190,7 +197,22 @@ void * is_in_list(list *l, node_type nt, char * string){
 void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) {
   list_node *new_node;
 
-  new_node = (list_node *) malloc(sizeof(list_node));
+  if(the_list->length == 0){/*there is only the head (== tail) created by new_list*/
+    new_node = the_list->head;
+  }
+  else{
+    new_node = (list_node *) malloc(sizeof(list_node));
+    if(n != the_list->tail){
+      n->next->prev = new_node;
+      new_node->next = n->next;
+    }
+    else{
+      new_node->next = NULL;
+      the_list->tail = new_node;
+    }
+    n->next = new_node;
+    new_node->prev = n;
+  }
   switch (nt){
   case article_node:
     new_node->key = (article *) key;
@@ -204,22 +226,36 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
   } 
   new_node->n_type = nt;
   ++the_list->length;
-
-  n->next->prev = new_node;
-  new_node->next = n->next;
-
-  n->next = new_node;
-  new_node->prev = n;
 }
 
+
 void list_insert(list * the_list, void * key, node_type nt){
-  list_insert_after(the_list, the_list->tail->prev, key, nt);
+  list_insert_after(the_list, the_list->tail, key, nt);
+}
+
+void remove_node_from_list(list *l, list_node *ln, int deep){
+  if(l->head == l->tail)
+    free_list(l, deep);
+  else if(ln == l->tail){
+    ln->prev->next = NULL;
+    l->tail = ln->prev;
+  }
+  else if(ln == l->head){
+    ln->next->prev = NULL;
+    l->head = ln->next;
+  }
+  else{
+    ln->next->prev = ln->prev;
+    ln->prev->next = ln->next;
+  }
+  free_list_node(ln, deep);
+  l->length--;
 }
 
 void list_print(list * the_list){
   list_node *cur_node;
-  cur_node = the_list->head->next;
-  while(cur_node != the_list->tail){
+  cur_node = the_list->head;
+  while(1){
     switch(cur_node->n_type) {
     case article_node:
       article_print(cur_node->key);
@@ -227,10 +263,11 @@ void list_print(list * the_list){
     case author_node:
       author_print(cur_node->key);
       break;
-    case other_node:
-      printf("\n node of other type - can't print\n");
+    default:
       break;
     }
+    if(cur_node == the_list->tail)
+      break;
     cur_node = cur_node->next;
   }
   printf("\n");
