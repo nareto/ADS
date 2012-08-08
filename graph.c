@@ -294,16 +294,13 @@ graph_node * new_graph_node(void * key, node_type nt){
     gn->key = key;
     break;
   }
-  gn->neighbours = (graph_node **) malloc(sizeof(graph_node *)); 
+  gn->edges = (edge **) malloc(sizeof(edge *)); 
   gn->n_neighbours = 0;
 
   return gn;
 }
 
 void free_graph_node(graph_node *gn, int deep){
-  int i;
-  graph_node * temp_gn;
-
   if(deep > 0){
     switch(gn->n_type){
     case article_node:
@@ -316,45 +313,43 @@ void free_graph_node(graph_node *gn, int deep){
       break;
     }
   }
-    
-  if(deep>0){
-    for(i=0; i < gn->n_neighbours; ++i){
-      temp_gn = gn->neighbours[i];
-      switch(temp_gn->n_type){
-      case article_node:
-	free_article(temp_gn->key);
-	break;
-      case author_node:
-	free_author(temp_gn->key);
-	break;
-      default:
-	break;
-      }
-    }
-  }
-  free(gn->neighbours);
+  free(gn->edges);
+  free(gn);
 }
 
-int is_arc(graph_node * gn1, graph_node * gn2){
+edge * is_edge(graph_node * gn1, graph_node * gn2){
   int i;
+  edge * edg;
+
   for(i=0;i<gn1->n_neighbours;++i){
-    if(gn1->neighbours[i] == gn2)
-      return 1;
+    edg = gn1->edges[i];
+    if(edg->n1 == gn2 || edg->n2 == gn2)
+      return edg;
   }
   return 0;
 }
 
-void add_arc(graph_node *gn1, graph_node *gn2){
-  if(!is_arc(gn1,gn2)){
+void add_edge(graph_node *gn1, graph_node *gn2){
+  edge * edg;
+
+  if((edg = is_edge(gn1,gn2)) == NULL){
     gn1->n_neighbours++;
     gn2->n_neighbours++;
+    gn1->edges = (edge **) realloc(gn1->edges, gn1->n_neighbours*sizeof(edge *));
+    gn2->edges = (edge **) realloc(gn2->edges, gn2->n_neighbours*sizeof(edge *));
 
-    gn1->neighbours = (graph_node **) realloc(gn1->neighbours, gn1->n_neighbours*sizeof(graph_node *));
-    gn2->neighbours = (graph_node **) realloc(gn2->neighbours, gn2->n_neighbours*sizeof(graph_node *));
+    edg = (edge *) malloc(sizeof(edge));
+    edg->n1 = gn1;
+    edg->n2 = gn2;
+    edg->weight = 1;
 
-    gn1->neighbours[gn1->n_neighbours - 1] = gn2;
-    gn2->neighbours[gn2->n_neighbours - 1] = gn1;
+    gn1->edges[gn1->n_neighbours - 1] = edg;
+    gn2->edges[gn2->n_neighbours - 1] = edg;
   }
+  else{
+    edg->weight++;
+  }
+
 }
 
 graph * new_graph(void){

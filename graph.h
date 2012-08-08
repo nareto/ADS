@@ -15,6 +15,7 @@ typedef enum node_type_t {empty_node, article_node, author_node, other_node} nod
 typedef struct article_t article; 
 typedef struct author_t author; 
 typedef struct list_t list;
+typedef struct edge_t edge;
 
 struct author_t {
   char * name;
@@ -48,8 +49,13 @@ typedef struct graph_node_t {
   node_type n_type;
   int id; /* this must match the key's id*/
   unsigned int n_neighbours;
-  struct graph_node_t ** neighbours;
+  edge ** edges;
 } graph_node;
+
+struct edge_t {
+  graph_node * n1, * n2;
+  int weight;
+};
 
 typedef struct graph_t {
   graph_node ** nodes; /*this should hold: nodes[n]->id == n*/
@@ -81,9 +87,9 @@ void list_print(list *l);
 
 /* GRAFI */
 graph_node * new_graph_node(void * key, node_type nt);
-void free_graph_node(graph_node *gn, int deep);/*if deep>0 free the key also*/
-int is_arc(graph_node * gn1, graph_node * gn2);
-void add_arc(graph_node * gn1, graph_node *gn2);
+void free_graph_node(graph_node *gn, int deep);
+edge * is_edge(graph_node * gn1, graph_node * gn2);
+void add_edge(graph_node * gn1, graph_node *gn2); /*every time it's called with the same arguments (in whatever order) the edge's weight is increased*/
 
 graph * new_graph(void);
 void free_graph(graph * g, int deep); /*if deep>0 free nodes' keys also*/

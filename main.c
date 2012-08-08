@@ -67,13 +67,12 @@ void read_file(FILE * inputfile){
 	  ++next_author_id;
 	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
 	}
-	/*properly update the article's arcs in the graph*/
+	/*properly update the article's edges in the graph*/
 	if(!list_is_empty(temp_author->articles)){
 	    cur_node = temp_author->articles->head;
 	    while(1){
-	      /* if(((article *) cur_node->key)->id < next_article_id - 1) */
 	      if((article *) cur_node->key != temp_article)
-		add_arc(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]);
+		add_edge(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]); /*add edge or increase its weight*/
 	      if(cur_node == temp_author->articles->tail)
 		break;
 	      cur_node = cur_node->next;
@@ -144,6 +143,7 @@ void graph_interface(){
   char input, string[MAX_LINE_LENGTH];
   author * athr;
   int end=0, j, i;
+  edge * edg;
 
   while(!end){
     if(PPRINT){
@@ -190,8 +190,13 @@ void graph_interface(){
       /* 	article_print(((article *) cur_node->key)); */
       /* 	cur_node = cur_node->next; */
       /* } */
-      for(j=0;j<artcl_graph->nodes[i]->n_neighbours; ++j)
-	article_print((article *) artcl_graph->nodes[i]->neighbours[j]->key);
+      for(j=0;j<artcl_graph->nodes[i]->n_neighbours; ++j){
+	edg = artcl_graph->nodes[i]->edges[j];
+	if(edg->n1 == artcl_graph->nodes[i])
+	  article_print((article *) edg->n2->key);
+	else
+	  article_print((article *) edg->n1->key);
+      }
       break;    
     case 'c':
       printf("\n %d Articles", artcl_graph->n_nodes);
