@@ -142,8 +142,7 @@ void interface(){
 void graph_interface(){
   char input, string[MAX_LINE_LENGTH];
   list_node * ln;
-  int end=0, j, i;
-  edge * edg;
+  int end=0, i, min_weight = 1;
 
   while(!end){
     if(PPRINT){
@@ -185,18 +184,10 @@ void graph_interface(){
       printf("\n Article Id: ");
       flush_input_buffer();
       scanf("%d", &i);
-      /* cur_node = artcl_graph->nodes[i]->adj_list->head->next; */
-      /* while(cur_node != artcl_graph->nodes[i]->adj_list->tail){ */
-      /* 	article_print(((article *) cur_node->key)); */
-      /* 	cur_node = cur_node->next; */
-      /* } */
-      for(j=0;j<artcl_graph->nodes[i]->n_neighbours; ++j){
-	edg = artcl_graph->nodes[i]->edges[j];
-	if(edg->n1 == artcl_graph->nodes[i])
-	  article_print((article *) edg->n2->key);
-	else
-	  article_print((article *) edg->n1->key);
-      }
+      printf("\n Minimum edge weight: ");
+      flush_input_buffer();
+      scanf("%d", &min_weight);
+      print_neighbours(artcl_graph->nodes[i], 1, min_weight);
       break;    
     case 'c':
       printf("\n %d Articles", artcl_graph->n_nodes);

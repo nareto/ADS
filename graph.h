@@ -94,5 +94,6 @@ void add_edge(graph_node * gn1, graph_node *gn2); /*every time it's called with 
 graph * new_graph(void);
 void free_graph(graph * g, int deep); /*if deep>0 free nodes' keys also*/
 void add_node_to_graph(graph_node * gn, graph * g);
+void print_neighbours(graph_node * gn, int depth, int min_weight);
 
 #endif

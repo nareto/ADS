@@ -376,3 +376,26 @@ void add_node_to_graph(graph_node * gn, graph * g){
   g->nodes = (graph_node **) realloc(g->nodes, g->n_nodes * sizeof(graph_node *));
   g->nodes[g->n_nodes - 1] = gn;
 }
+
+void print_neighbours(graph_node * gn, int depth, int min_weight){
+  edge * edg;
+  int j;
+
+  if(depth > 1){
+    printf("Not yet implemented with depth > 1");
+  }
+
+  for(j=0;j<gn->n_neighbours; ++j){
+    edg = gn->edges[j];
+    if(edg->weight >= min_weight){
+      if(PPRINT)
+	printf("\n \033[1;33mEdge weight:\033[0m %d", edg->weight);
+      else
+	printf("\n Edge weight: %d", edg->weight);
+      if(edg->n1 == gn)
+	article_print((article *) edg->n2->key);
+      else
+	article_print((article *) edg->n1->key);
+    }
+  }
+}
