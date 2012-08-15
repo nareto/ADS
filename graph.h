@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define AUTHORS_HASH_DIM 100001
+#define AUTHORS_HASH_DIM 700000
 #define MAX_LINE_LENGTH 1000
 
 /* STRUCTS */
@@ -79,7 +79,7 @@ list * new_list(void);
 void free_list_node(list_node * ln, int deep);/*if deep>0 free the key also*/
 void free_list(list * l, int deep);/*if the deep > 0 free nodes' keys also*/
 int list_is_empty(list *l);
-void * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
+list_node * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
 void list_insert_after(list * l, list_node * n, void * key, node_type nt);
 void list_insert(list *l, void * key, node_type nt); /*inserts at the end of the list*/
 void remove_node_from_list(list *l, list_node *ln, int deep);

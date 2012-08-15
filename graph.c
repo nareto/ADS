@@ -166,7 +166,7 @@ int list_is_empty(list *l){
     return 0;
 }
 
-void * is_in_list(list *l, node_type nt, char * string){
+list_node * is_in_list(list *l, node_type nt, char * string){
   list_node * cur_node;
   int j=0;
  
@@ -176,11 +176,11 @@ void * is_in_list(list *l, node_type nt, char * string){
       switch(nt){
       case article_node:    
 	if(strcmp(((article *) cur_node->key)->title,string) == 0)
-	  return cur_node->key;
+	  return cur_node;
 	break;
       case author_node:
 	if(strcmp(((author *) cur_node->key)->name,string) == 0)
-	  return cur_node->key;   
+	  return cur_node;   
 	break;
       default:
 	return NULL;

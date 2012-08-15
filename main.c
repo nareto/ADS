@@ -9,12 +9,11 @@ void flush_input_buffer(void);
 void remove_ending_newline(char * string);
 int line_is_blank(char * line);
 
-list * authors_dict[AUTHORS_HASH_DIM];
+hash_table * authors_dict;
 graph * artcl_graph;
 
 int main(int argc, char ** argv){
   FILE * inputfile;
-  int i;
 
   if(argc != 2){
     printf("USAGE: %s input_parsed_file\n", argv[0]);
@@ -22,9 +21,7 @@ int main(int argc, char ** argv){
   }
 
   inputfile=fopen(argv[1], "r");
-  for(i=0;i<AUTHORS_HASH_DIM;i++){
-    authors_dict[i] = new_list();
-  }
+  authors_dict = new_hash_table(AUTHORS_HASH_DIM);
   artcl_graph = new_graph();
   read_file(inputfile);
   fclose(inputfile);
@@ -35,38 +32,42 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char * line;
-  int newline_to_title = 1, line_count = 1;
+  int block_ended = 1, line_count = 1;
   unsigned int next_article_id = 0, next_author_id = 0;
   article * temp_article;
   author * temp_author;
-  list_node * cur_node;
+  list_node * cur_node, * temp_author_node;
   graph_node * temp_gnode;
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
   line = fgets(line, MAX_LINE_LENGTH, inputfile);
-  while(line_is_blank(line))
+  while(line_is_blank(line)){
+    ++line_count;
     line = fgets(line, MAX_LINE_LENGTH, inputfile);
+  }
   while(line != NULL){
     ++line_count;
-    if(newline_to_title && !line_is_blank(line)){ /*a new article/authors block begins*/
+    if(block_ended && !line_is_blank(line)){ /*a new article/authors block begins*/
       remove_ending_newline(line);
-      newline_to_title = 0;
+      block_ended = 0;
       temp_article = new_article(line, next_article_id);
       temp_gnode = new_graph_node(temp_article, article_node);
       ++next_article_id;
     }
     else {
       if(line_is_blank(line)){ /*we have just terminated processing an article/authors block */
-	newline_to_title = 1;
+	block_ended = 1;
 	add_node_to_graph(temp_gnode, artcl_graph);
       }
-      else{
+      else{ /*there's a new author for the current article/authors block*/
 	remove_ending_newline(line);
-	if((temp_author = is_in_list(authors_dict[hashf(line, AUTHORS_HASH_DIM)], author_node, line)) == NULL){
+	if((temp_author_node = search_in_hash(line, author_node, authors_dict)) == NULL){
 	  temp_author = new_author(line, next_author_id);
 	  ++next_author_id;
-	  list_insert(authors_dict[hashf(line, AUTHORS_HASH_DIM)], temp_author, author_node);
+	  insert_in_hash(temp_author, author_node, authors_dict);
 	}
+	else
+	  temp_author = (author *) temp_author_node->key;
 	/*properly update the article's edges in the graph*/
 	if(!list_is_empty(temp_author->articles)){
 	    cur_node = temp_author->articles->head;
@@ -89,7 +90,7 @@ void read_file(FILE * inputfile){
 
 void interface(){
   char input;
-  int end = 0, i, deep = 0;
+  int end = 0, deep = 0;
   char string[MAX_LINE_LENGTH];
 
   while(!end){
@@ -122,8 +123,7 @@ void interface(){
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
       deep = atoi(string);
-      for(i=0;i<AUTHORS_HASH_DIM;i++)
-	free_list(authors_dict[i], deep);
+      free_hash_table(authors_dict, deep);
       break;
     case 'F':
       printf("\n do you want to free also the articles struct? (1=yes, 0=no): ");    
@@ -141,7 +141,7 @@ void interface(){
 
 void graph_interface(){
   char input, string[MAX_LINE_LENGTH];
-  author * athr;
+  list_node * ln;
   int end=0, j, i;
   edge * edg;
 
@@ -169,11 +169,11 @@ void graph_interface(){
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
       remove_ending_newline(string);
-      athr = is_in_list(authors_dict[hashf(string, AUTHORS_HASH_DIM)], author_node, string);
-      if(athr == NULL)
+      ln = search_in_hash(string, author_node, authors_dict);
+      if(ln == NULL)
 	printf("\n sorry, author not present \n");
       else
-	author_print(athr);
+	author_print((author *) ln->key);
       break;
     case 'A':
       printf("\n Article Id: ");
@@ -209,26 +209,24 @@ void graph_interface(){
 }
 
 void hash_interface(){
-  int i, j, author_count = 0, end = 0, unit = 100, cell_number = 0;
+  int end = 0, unit = 100;
   char input, string[MAX_LINE_LENGTH];
   
   while(!end){
     if(PPRINT){
-      printf("\n \033[1;31mHash Table commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n \033[1;31mHash Table commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "\033[1;32mh\033[0m", "calculate the hash of a string",
-	     "\033[1;32mp\033[0m", "print the list in a hash cell",
+	     "\033[1;32ml\033[0m", "print the load factor of the authors' hash table",
 	     "\033[1;32md\033[0m", "print a histogram of the collisions in the hash table",
-	     "\033[1;32ms\033[0m", "set the units for the histogram",
-	     "\033[1;32mc\033[0m", "print line count (add up the hash's table lists lenghts)",
+	     "\033[1;32mc\033[0m", "print the number of keys in the hash table",
 	     "\033[1;32mq\033[0m", "return to main menu");
     }
     else{
-      printf("\n Hash Table commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n Hash Table commands:  \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "h", "calculate the hash of a string",
-	     "p", "print the list in a hash cell",
+	     "l", "print the load factor of the authors' hash table",
 	     "d", "print a histogram of the collisions in the hash table",
-	     "s", "set the units for the histogram",
-	     "c", "print the authors count (add up the hash's table lists lenghts)",
+	     "c", "print the number of authors in the hash table",
 	     "q", "return to main menu");
     }
     scanf(" %c", &input);
@@ -240,41 +238,19 @@ void hash_interface(){
       fgets(string, MAX_LINE_LENGTH, stdin);
       printf("\n %ld\n", hashf(string, AUTHORS_HASH_DIM));
       break;
-    case 'p' :
-      printf("cell number (default %d): ", cell_number);
-      flush_input_buffer();
-      fgets(string, MAX_LINE_LENGTH, stdin);
-      if(strcmp(string, "\n") != 0)
-	cell_number = atoi(string);
-      list_print(authors_dict[cell_number]);
+    case 'l' :
+      printf("load factor: %f", (float)authors_dict->n_keys / (float) authors_dict->modulo);
       break;
     case 'd':
-      for(i = 0; i< AUTHORS_HASH_DIM; i++){
-
-	if(PPRINT)
-	  printf("\033[1m%d:\033[0m",i);
-	else
-	  printf("%d:",i);	  
-	for(j=0; j< authors_dict[i]->length; j = j + unit)
-	  if(PPRINT)
-	    printf("\033[1;33m*\033[0m");
-	  else
-	    printf("*");
-	printf("\n");
-      }
-      printf("\n a star corresponds to %d elements\n", unit);
-      break;
-    case 's':
       printf("set the number of authors a dot in the histogram corresponds to (default %d): ", unit);
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
-      unit = atoi(string);
+      if(strcmp(string, "\n") != 0)
+	unit = atoi(string);
+      print_hash_histogram(authors_dict, unit);
+      break;
     case 'c':
-      author_count = 0;
-      for(i=0;i<AUTHORS_HASH_DIM;i++){
-	author_count = author_count + authors_dict[i]->length;
-      }
-      printf("\n %d lines \n", author_count);
+      printf("\n %d keys \n", authors_dict->n_keys);
       break;
     case 'q':
       end = 1;
