@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define AUTHORS_HASH_DIM 700000
+#define AUTHORS_HASH_DIM 100000
 #define MAX_LINE_LENGTH 1000
 
 /* STRUCTS */
