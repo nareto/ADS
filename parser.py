@@ -58,30 +58,19 @@ def parse(inputpath, outputpath):
             if is_work: #if the previous for loop hasn't matched any closing tag, search for authors
                 start_closing_tag = len(line) - 1
                 for i in range(len(line)-1,0,-1):
-                    if line[i] == "<":
+                    if line[i-2:i] == "</":
+                        start_closing_tag = i-2
                         break
                     else:
                         start_closing_tag = i -1
         
                 authorin=PATTERNS['authorin'].match(line)
                 if authorin != None:
-                    line = line[len(authorin.group(0)):]
-                    start_closing_tag -= len(authorin.group(0)) 
-                    authorout=PATTERNS['authorout'].match(line,start_closing_tag)
-                    if authorout != None:
-                        line = line[:-len(authorout.group(0)) - 1]
-                    	#authors are inserted at the start of current_authors
-                        current_authors = [line] + current_authors 
+                    current_authors = [line[len(authorin.group(0)):start_closing_tag]] + current_authors
 
                 titlein=PATTERNS['titlein'].match(line)
                 if titlein != None:
-                    line = line[len(titlein.group(0)):]
-                    start_closing_tag -= len(titlein.group(0))
-                    titleout=PATTERNS['titleout'].match(line,start_closing_tag)
-                    if titleout != None:
-                        line = line[:-len(titleout.group(0)) - 1]
-                        #the title is inserted at the end of current_authors
-                        current_authors = current_authors + [line]
+                    current_authors = current_authors + [line[len(titlein.group(0)):start_closing_tag]]
 
         elif line == '\n':
             pass
