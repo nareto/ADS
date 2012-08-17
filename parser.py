@@ -51,9 +51,9 @@ def parse(inputpath, outputpath):
             for work_out in WORK_OUTS.iteritems():
                 if work_out[1].match(line) != None:
                     is_work = 0
-                    outf.write('\n')
                     while current_authors != []:
                         outf.write(current_authors.pop() + '\n')
+                    outf.write('\n')
                     break
             if is_work: #if the previous for loop hasn't matched any closing tag, search for authors
                 start_closing_tag = len(line) - 1
