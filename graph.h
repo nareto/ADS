@@ -35,7 +35,7 @@ struct article_t {
 typedef struct list_node_t {
   void * key;
   node_type n_type;
-  struct list_node_t *prev, *next;
+  struct list_node_t  *next;
 } list_node;
 
 struct list_t {
@@ -53,10 +53,6 @@ typedef struct graph_node_t {
   char * weights;
 } graph_node;
 
-/* struct edge_t { */
-/*   char weight; */
-/*   graph_node * n1, * n2; */
-/* }; */
 
 typedef struct graph_t {
   graph_node ** nodes; /*this should hold: nodes[n]->id == n*/
@@ -83,7 +79,6 @@ int list_is_empty(list *l);
 list_node * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
 void list_insert_after(list * l, list_node * n, void * key, node_type nt);
 void list_insert(list *l, void * key, node_type nt); /*inserts at the end of the list*/
-void remove_node_from_list(list *l, list_node *ln, int deep);
 void list_print(list *l);
 
 /* GRAFI */

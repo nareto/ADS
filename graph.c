@@ -118,7 +118,6 @@ list * new_list(){
 
   head = (list_node *) malloc(sizeof(list_node));
   head->key = NULL;
-  head->prev = NULL;
   head->next = NULL;
   head->n_type = empty_node;
 
@@ -147,13 +146,14 @@ void free_list_node(list_node *ln, int deep){
 }
 
 void free_list(list* the_list, int deep){
-  list_node * cur_node = the_list->head;
+  list_node *prev_node, * cur_node = the_list->head;
 
   while(1){
     if(cur_node == the_list->tail)
       break;
+    prev_node = cur_node;
     cur_node = cur_node->next;
-    free_list_node(cur_node->prev, deep);
+    free_list_node(prev_node, deep);
   }
   free(the_list->tail);
   free(the_list);
@@ -203,7 +203,6 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
   else{
     new_node = (list_node *) malloc(sizeof(list_node));
     if(n != the_list->tail){
-      n->next->prev = new_node;
       new_node->next = n->next;
     }
     else{
@@ -211,7 +210,6 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
       the_list->tail = new_node;
     }
     n->next = new_node;
-    new_node->prev = n;
   }
   switch (nt){
   case article_node:
@@ -231,25 +229,6 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
 
 void list_insert(list * the_list, void * key, node_type nt){
   list_insert_after(the_list, the_list->tail, key, nt);
-}
-
-void remove_node_from_list(list *l, list_node *ln, int deep){
-  if(l->head == l->tail)
-    free_list(l, deep);
-  else if(ln == l->tail){
-    ln->prev->next = NULL;
-    l->tail = ln->prev;
-  }
-  else if(ln == l->head){
-    ln->next->prev = NULL;
-    l->head = ln->next;
-  }
-  else{
-    ln->next->prev = ln->prev;
-    ln->prev->next = ln->next;
-  }
-  free_list_node(ln, deep);
-  l->length--;
 }
 
 void list_print(list * the_list){
