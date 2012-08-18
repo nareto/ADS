@@ -20,14 +20,14 @@ typedef struct edge_t edge;
 struct author_t {
   char * name;
   list * articles;
-  int id;
+  unsigned int id;
   int n_articles;
 };
 
 struct article_t {
   char * title;
   list * authors;
-  int id;
+  unsigned int id;
   int n_authors;
 };
 
@@ -49,13 +49,14 @@ typedef struct graph_node_t {
   node_type n_type;
   int id; /* this must match the key's id*/
   unsigned int n_neighbours;
-  edge ** edges;
+  struct graph_node_t ** neighbours;
+  char * weights;
 } graph_node;
 
-struct edge_t {
-  graph_node * n1, * n2;
-  int weight;
-};
+/* struct edge_t { */
+/*   char weight; */
+/*   graph_node * n1, * n2; */
+/* }; */
 
 typedef struct graph_t {
   graph_node ** nodes; /*this should hold: nodes[n]->id == n*/
@@ -88,7 +89,6 @@ void list_print(list *l);
 /* GRAFI */
 graph_node * new_graph_node(void * key, node_type nt);
 void free_graph_node(graph_node *gn, int deep);
-edge * is_edge(graph_node * gn1, graph_node * gn2);
 void add_edge(graph_node * gn1, graph_node *gn2); /*every time it's called with the same arguments (in whatever order) the edge's weight is increased*/
 
 graph * new_graph(void);

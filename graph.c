@@ -294,7 +294,8 @@ graph_node * new_graph_node(void * key, node_type nt){
     gn->key = key;
     break;
   }
-  gn->edges = (edge **) malloc(sizeof(edge *)); 
+  gn->neighbours = (graph_node **) malloc(sizeof(graph_node *)); 
+  gn->weights = (char *) malloc(sizeof(char));
   gn->n_neighbours = 0;
 
   return gn;
@@ -313,41 +314,44 @@ void free_graph_node(graph_node *gn, int deep){
       break;
     }
   }
-  free(gn->edges);
+  free(gn->neighbours);
+  free(gn->weights);
   free(gn);
 }
 
-edge * is_edge(graph_node * gn1, graph_node * gn2){
-  int i;
-  edge * edg;
+void add_edge(graph_node *gn1, graph_node *gn2){
+  int is_edge = 0,i,j;
 
   for(i=0;i<gn1->n_neighbours;++i){
-    edg = gn1->edges[i];
-    if(edg->n1 == gn2 || edg->n2 == gn2)
-      return edg;
+    if(gn1->neighbours[i] == gn2){
+      for(j=0;j<gn2->n_neighbours;++j){
+	if(gn2->neighbours[j] == gn1){
+	  is_edge = 1;
+	  break;
+	}
+      }
+    break;
+    }
   }
-  return 0;
-}
 
-void add_edge(graph_node *gn1, graph_node *gn2){
-  edge * edg;
-
-  if((edg = is_edge(gn1,gn2)) == NULL){
+  if(!is_edge){
     gn1->n_neighbours++;
     gn2->n_neighbours++;
-    gn1->edges = (edge **) realloc(gn1->edges, gn1->n_neighbours*sizeof(edge *));
-    gn2->edges = (edge **) realloc(gn2->edges, gn2->n_neighbours*sizeof(edge *));
+    gn1->neighbours = (graph_node **) realloc(gn1->neighbours, gn1->n_neighbours*sizeof(graph_node *));
+    gn2->neighbours = (graph_node **) realloc(gn2->neighbours, gn2->n_neighbours*sizeof(graph_node *));
 
-    edg = (edge *) malloc(sizeof(edge));
-    edg->n1 = gn1;
-    edg->n2 = gn2;
-    edg->weight = 1;
+    gn1->weights = (char *) realloc(gn1->weights, gn1->n_neighbours*sizeof(char));
+    gn2->weights = (char *) realloc(gn2->weights, gn2->n_neighbours*sizeof(char));
 
-    gn1->edges[gn1->n_neighbours - 1] = edg;
-    gn2->edges[gn2->n_neighbours - 1] = edg;
+    gn1->neighbours[gn1->n_neighbours - 1] = gn2;
+    gn2->neighbours[gn2->n_neighbours - 1] = gn1;
+
+    gn1->weights[gn1->n_neighbours -1] = 1;
+    gn2->weights[gn2->n_neighbours -1] = 1;
   }
   else{
-    edg->weight++;
+    gn1->weights[i]++;
+    gn2->weights[j]++;
   }
 
 }
@@ -378,7 +382,6 @@ void add_node_to_graph(graph_node * gn, graph * g){
 }
 
 void print_neighbours(graph_node * gn, int depth, int min_weight){
-  edge * edg;
   int j;
 
   if(depth > 1){
@@ -386,16 +389,12 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
   }
 
   for(j=0;j<gn->n_neighbours; ++j){
-    edg = gn->edges[j];
-    if(edg->weight >= min_weight){
+    if(gn->weights[j] >= min_weight){
       if(PPRINT)
-	printf("\n \033[1;33mEdge weight:\033[0m %d", edg->weight);
+	printf("\n \033[1;33mEdge weight:\033[0m %d", gn->weights[j]);
       else
-	printf("\n Edge weight: %d", edg->weight);
-      if(edg->n1 == gn)
-	article_print((article *) edg->n2->key);
-      else
-	article_print((article *) edg->n1->key);
+	printf("\n Edge weight: %d", gn->weights[j]);
+      article_print((article *) gn->neighbours[j]->key);
     }
   }
 }

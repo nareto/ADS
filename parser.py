@@ -10,8 +10,6 @@
 #Autore 2
 #
 
-#lxml.etree.fromstring('<?xml version="1.1"?><foo>fdsa<br>fdas</br>fdas</foo>').xpath('//text()')
-
 import sys
 import re
 
