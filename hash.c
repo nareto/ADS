@@ -17,14 +17,14 @@ unsigned long int hashf(char * key, int modulo){
  return hash;
 }
 
-hash_table * new_hash_table(int modulo){
+hash_table * new_hash_table(int modulo, node_type nt){
   int i;
   hash_table * ht;
 
   ht = (hash_table *) malloc(sizeof(hash_table));
   ht->array = (list **) malloc(modulo*sizeof(list *));
   for(i=0;i<modulo;i++){
-    ht->array[i] = new_list();
+    ht->array[i] = new_list(nt);
   }
   ht->modulo = modulo;
   ht->n_keys=0;
@@ -42,18 +42,18 @@ void insert_in_hash(void *key, node_type nt, hash_table *ht){
   ++ht->n_keys;
   switch(nt){
   case article_node:
-    list_insert(ht->array[hashf(((article *)key)->title,ht->modulo)], key, nt);
+    list_insert(ht->array[hashf(((article *)key)->title,ht->modulo)], key);
     break;
   case author_node:
-    list_insert(ht->array[hashf(((author *)key)->name,ht->modulo)], key, nt);
+    list_insert(ht->array[hashf(((author *)key)->name,ht->modulo)], key);
     break;
   default:
     break;
   }
 }
 
-list_node * search_in_hash(char * key, node_type nt, hash_table *ht){
-  return is_in_list(ht->array[hashf(key,ht->modulo)], nt, key); 
+list_node * search_in_hash(char * key, hash_table *ht){
+  return is_in_list(ht->array[hashf(key,ht->modulo)], key); 
 }
 
 void print_hash_histogram(hash_table *ht, int unit){

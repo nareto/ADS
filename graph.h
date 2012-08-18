@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define AUTHORS_HASH_DIM 100000
+#define AUTHORS_HASH_DIM 2000000
 #define MAX_LINE_LENGTH 1000
 
 /* STRUCTS */
@@ -34,11 +34,11 @@ struct article_t {
 /*LISTE*/
 typedef struct list_node_t {
   void * key;
-  node_type n_type;
   struct list_node_t  *next;
 } list_node;
 
 struct list_t {
+  node_type n_type;
   list_node * head, *tail;
   int length;
 };
@@ -46,17 +46,16 @@ struct list_t {
 /* GRAFI */
 typedef struct graph_node_t {
   void * key;
-  node_type n_type;
-  int id; /* this must match the key's id*/
-  unsigned int n_neighbours;
+  int n_neighbours;
   struct graph_node_t ** neighbours;
   char * weights;
 } graph_node;
 
 
 typedef struct graph_t {
-  graph_node ** nodes; /*this should hold: nodes[n]->id == n*/
-  int n_nodes;
+  node_type n_type;
+  graph_node ** nodes; /*this should hold: nodes[n]->key->id == n*/
+  unsigned int n_nodes;
 } graph;
 
 /* FUNCTIONS  */
@@ -72,21 +71,21 @@ void add_author_to_article(author * athr, article * artcl);
 void add_article_to_author(article * artcl, author * athr);
 
 /*LISTE*/
-list * new_list(void);
-void free_list_node(list_node * ln, int deep);/*if deep>0 free the key also*/
+list * new_list(node_type nt);
+void remove_list_node(list * l, list_node * ln, int deep);/*if deep>0 free the key also*/
 void free_list(list * l, int deep);/*if the deep > 0 free nodes' keys also*/
 int list_is_empty(list *l);
-list_node * is_in_list(list *l, node_type nt, char * string);/*string is, depending on nt, the article's title or the author's name*/
-void list_insert_after(list * l, list_node * n, void * key, node_type nt);
-void list_insert(list *l, void * key, node_type nt); /*inserts at the end of the list*/
+list_node * is_in_list(list *l, char * string);/*string is, depending on nt, the article's title or the author's name*/
+void list_insert_after(list * l, list_node * n, void * key);
+void list_insert(list *l, void * key); /*inserts at the end of the list*/
 void list_print(list *l);
 
 /* GRAFI */
 graph_node * new_graph_node(void * key, node_type nt);
-void free_graph_node(graph_node *gn, int deep);
+/* void remove_graph_node(graph * g, graph_node *gn, int deep); */
 void add_edge(graph_node * gn1, graph_node *gn2); /*every time it's called with the same arguments (in whatever order) the edge's weight is increased*/
 
-graph * new_graph(void);
+graph * new_graph(node_type nt);
 void free_graph(graph * g, int deep); /*if deep>0 free nodes' keys also*/
 void add_node_to_graph(graph_node * gn, graph * g);
 void print_neighbours(graph_node * gn, int depth, int min_weight);

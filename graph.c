@@ -7,7 +7,7 @@ article * new_article(char * the_title, int id){
   artcl->n_authors = 0;
   artcl->title = (char *) malloc((1+strlen(the_title))*sizeof(char));
   strcpy(artcl->title, the_title);
-  artcl->authors = new_list();
+  artcl->authors = new_list(author_node);
   artcl->id = id;
 
   return artcl;
@@ -20,7 +20,7 @@ author * new_author(char * name, int id){
   athr->n_articles = 0;
   athr->name = (char *) malloc((1+strlen(name))*sizeof(char));
   strcpy(athr->name, name);
-  athr->articles = new_list();
+  athr->articles = new_list(article_node);
   athr->id = id;
 
   return athr;
@@ -101,16 +101,16 @@ void author_short_print(author * athr){
 
 void add_author_to_article(author * the_author, article * the_article){
   the_article->n_authors++;
-  list_insert(the_article->authors, the_author, author_node);
+  list_insert(the_article->authors, the_author);
 }
 
 void add_article_to_author(article * the_article, author * the_author){
   the_author->n_articles ++;
-  list_insert(the_author->articles, the_article, article_node);
+  list_insert(the_author->articles, the_article);
 }
 
 /*LISTE*/
-list * new_list(){
+list * new_list(node_type nt){
   list * the_list;
   list_node * head;
 
@@ -119,19 +119,21 @@ list * new_list(){
   head = (list_node *) malloc(sizeof(list_node));
   head->key = NULL;
   head->next = NULL;
-  head->n_type = empty_node;
 
   the_list->head = head;
   the_list->tail = head;
   
+  the_list->n_type = nt;
   the_list->length = 0;
  
   return the_list;
 }
 
-void free_list_node(list_node *ln, int deep){
+void remove_list_node(list *l ,list_node *ln, int deep){
+  list_node * prev_node = l->head;
+
   if(deep > 0){
-    switch(ln->n_type){
+    switch(l->n_type){
     case article_node:
       free_article(ln->key);
       break;
@@ -141,6 +143,17 @@ void free_list_node(list_node *ln, int deep){
     default:
       break;
     }
+  }
+  
+  while(prev_node->next != ln){
+    prev_node = prev_node->next;
+  }
+  if(ln == l->tail){
+    prev_node->next = NULL;
+    l->tail = prev_node;
+  }
+  else{
+    prev_node->next = ln->next;
   }
   free(ln);
 }
@@ -153,48 +166,58 @@ void free_list(list* the_list, int deep){
       break;
     prev_node = cur_node;
     cur_node = cur_node->next;
-    free_list_node(prev_node, deep);
+    remove_list_node(the_list, prev_node, deep);
   }
   free(the_list->tail);
   free(the_list);
 }
 
 int list_is_empty(list *l){
-  if(l->head == l->tail && l->head->n_type == empty_node)
+  /* if(l->head == l->tail && l->n_type == empty_node) */
+  /*   return 1; */
+  /* else */
+  /*   return 0; */
+  if(l->length == 0)
     return 1;
   else
     return 0;
 }
 
-list_node * is_in_list(list *l, node_type nt, char * string){
+list_node * is_in_list(list *l, char * string){
   list_node * cur_node;
   int j=0;
  
   cur_node = l->head;
   if(!list_is_empty(l)){
-    while(1){
-      switch(nt){
-      case article_node:    
+    switch(l->n_type){
+    case article_node:   
+      while(1){
 	if(strcmp(((article *) cur_node->key)->title,string) == 0)
 	  return cur_node;
-	break;
-      case author_node:
-	if(strcmp(((author *) cur_node->key)->name,string) == 0)
-	  return cur_node;   
-	break;
-      default:
-	return NULL;
+	if(cur_node == l->tail)
+	  return NULL;
+	cur_node = cur_node->next;
+	j++;
       }
-      if(cur_node == l->tail)
-	return NULL;
-      cur_node = cur_node->next;
-      j++;
+      break;
+    case author_node:
+      while(1){
+	if(strcmp(((author *) cur_node->key)->name,string) == 0)
+	  return cur_node;
+	if(cur_node == l->tail)
+	  return NULL;
+	cur_node = cur_node->next;
+	j++;
+      }   
+      break;
+    default:
+      return NULL;
     }
   }
   return NULL;
 }
 
-void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) {
+void list_insert_after(list * the_list, list_node *n, void * key) {
   list_node *new_node;
 
   if(the_list->length == 0){/*there is only the head (== tail) created by new_list*/
@@ -211,7 +234,7 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
     }
     n->next = new_node;
   }
-  switch (nt){
+  switch (the_list->n_type){
   case article_node:
     new_node->key = (article *) key;
     break;
@@ -222,20 +245,19 @@ void list_insert_after(list * the_list, list_node *n, void * key, node_type nt) 
     new_node->key = key;
     break;
   } 
-  new_node->n_type = nt;
   ++the_list->length;
 }
 
 
-void list_insert(list * the_list, void * key, node_type nt){
-  list_insert_after(the_list, the_list->tail, key, nt);
+void list_insert(list * the_list, void * key){
+  list_insert_after(the_list, the_list->tail, key);
 }
 
 void list_print(list * the_list){
   list_node *cur_node;
   cur_node = the_list->head;
   while(1){
-    switch(cur_node->n_type) {
+    switch(the_list->n_type) {
     case article_node:
       article_print(cur_node->key);
       break;
@@ -263,11 +285,9 @@ graph_node * new_graph_node(void * key, node_type nt){
   switch(nt) {
   case author_node:
     gn->key = (author *) key;
-    gn->id = ((author *) gn->key)->id;
     break;
   case article_node:
     gn->key = (article *) key;
-    gn->id = ((article *) gn->key)->id;
     break;
   default:
     gn->key = key;
@@ -280,23 +300,23 @@ graph_node * new_graph_node(void * key, node_type nt){
   return gn;
 }
 
-void free_graph_node(graph_node *gn, int deep){
-  if(deep > 0){
-    switch(gn->n_type){
-    case article_node:
-      free_article(gn->key);
-      break;
-    case author_node:
-      free_author(gn->key);
-      break;
-    default:
-      break;
-    }
-  }
-  free(gn->neighbours);
-  free(gn->weights);
-  free(gn);
-}
+/* void remove_graph_node(graph * g, graph_node *gn, int deep){ */
+/*   if(deep > 0){ */
+/*     switch(g->n_type){ */
+/*     case article_node: */
+/*       free_article(gn->key); */
+/*       break; */
+/*     case author_node: */
+/*       free_author(gn->key); */
+/*       break; */
+/*     default: */
+/*       break; */
+/*     } */
+/*   } */
+/*   free(gn->neighbours); */
+/*   free(gn->weights); */
+/*   free(gn); */
+/* } */
 
 void add_edge(graph_node *gn1, graph_node *gn2){
   int is_edge = 0,i,j;
@@ -335,21 +355,36 @@ void add_edge(graph_node *gn1, graph_node *gn2){
 
 }
 
-graph * new_graph(void){
+graph * new_graph(node_type nt){
   graph * g;
 
   g = (graph *) malloc(sizeof(graph));
   g->nodes = (graph_node **) malloc(sizeof(graph_node *));
   g->n_nodes = 0;
+  g->n_type = nt;
 
   return g;
 }
 
 void free_graph(graph *g, int deep){
-  int i;
+  unsigned int i;
 
   for(i=0; i< g->n_nodes; ++i){
-    free_graph_node(g->nodes[i], deep);
+    if(deep > 0){
+      switch(g->n_type){
+      case article_node:
+	free_article(g->nodes[i]->key);
+	break;
+      case author_node:
+	free_author(g->nodes[i]->key);
+	break;
+      default:
+	break;
+      }
+    }
+    free(g->nodes[i]->neighbours);
+    free(g->nodes[i]->weights);
+    free(g->nodes[i]);
   }
   free(g);
 }

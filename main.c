@@ -21,8 +21,8 @@ int main(int argc, char ** argv){
   }
 
   inputfile=fopen(argv[1], "r");
-  authors_dict = new_hash_table(AUTHORS_HASH_DIM);
-  artcl_graph = new_graph();
+  authors_dict = new_hash_table(AUTHORS_HASH_DIM, author_node);
+  artcl_graph = new_graph(article_node);
   read_file(inputfile);
   fclose(inputfile);
   interface();
@@ -41,7 +41,7 @@ void read_file(FILE * inputfile){
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
   line = fgets(line, MAX_LINE_LENGTH, inputfile);
-  while(line_is_blank(line)){
+  while(line_is_blank(line)){ /*remove leading white lines*/
     ++line_count;
     line = fgets(line, MAX_LINE_LENGTH, inputfile);
   }
@@ -56,12 +56,16 @@ void read_file(FILE * inputfile){
     }
     else {
       if(line_is_blank(line)){ /*we have just terminated processing an article/authors block */
-	block_ended = 1;
-	add_node_to_graph(temp_gnode, artcl_graph);
+	if(!block_ended){
+	  block_ended = 1;
+	  add_node_to_graph(temp_gnode, artcl_graph);
+	  if(next_article_id != artcl_graph->n_nodes)
+	    printf("%d\n", line_count);
+	}
       }
       else{ /*there's a new author for the current article/authors block*/
 	remove_ending_newline(line);
-	if((temp_author_node = search_in_hash(line, author_node, authors_dict)) == NULL){
+	if((temp_author_node = search_in_hash(line, authors_dict)) == NULL){
 	  temp_author = new_author(line, next_author_id);
 	  ++next_author_id;
 	  insert_in_hash(temp_author, author_node, authors_dict);
@@ -168,7 +172,7 @@ void graph_interface(){
       flush_input_buffer();
       fgets(string, MAX_LINE_LENGTH, stdin);
       remove_ending_newline(string);
-      ln = search_in_hash(string, author_node, authors_dict);
+      ln = search_in_hash(string, authors_dict);
       if(ln == NULL)
 	printf("\n sorry, author not present \n");
       else
