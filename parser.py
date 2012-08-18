@@ -25,7 +25,7 @@ WORK_OUTS={'articleout': re.compile(r'</article.*>'),
 
 PATTERNS={'authorin': re.compile(r'<author.*?>'),
           'authorout': re.compile(r'</author.*>'),
-          'titlein': re.compile(r'<title.*?>'),
+          'titlein': re.compile(r'<title.*?>(?!Home Page)'),
           'titleout': re.compile(r'</title.*>')}
 
 def usage():
@@ -71,7 +71,7 @@ def parse(inputpath, outputpath):
                     current_authors = current_authors + [line[len(titlein.group(0)):start_closing_tag]]
 
         elif line == '\n':
-            pass
+            current_authors = []
         else:
             #search for starting of WORK block
             for work_in in WORK_INS.iteritems():

@@ -59,8 +59,6 @@ void read_file(FILE * inputfile){
 	if(!block_ended){
 	  block_ended = 1;
 	  add_node_to_graph(temp_gnode, artcl_graph);
-	  if(next_article_id != artcl_graph->n_nodes)
-	    printf("%d\n", line_count);
 	}
       }
       else{ /*there's a new author for the current article/authors block*/
