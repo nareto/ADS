@@ -443,7 +443,7 @@ int total_edges(graph *g){
 }
 
 float medium_edges(graph *g){
-  return total_edges(g)/g->n_nodes;
+  return ((float) total_edges(g)/ (float) g->n_nodes);
 }
 
 graph_node *max_edges(graph *g){
