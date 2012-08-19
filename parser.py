@@ -14,12 +14,12 @@ import sys
 import re
 
 WORK_INS={'articlein': re.compile(r'<article.*?>'),
-          'bookin': re.compile(r'<book.*?>'),
+          'bookin': re.compile(r'<book(?!title).*?>'),
           'inproceedingsin': re.compile(r'<inproceedings.*?>'),
           'wwwin': re.compile(r'<www.*?>')}
 
 WORK_OUTS={'articleout': re.compile(r'</article.*>'),
-          'bookout': re.compile(r'</book.*>'),
+          'bookout': re.compile(r'</book(?!title).*>'),
           'inproceedingsout': re.compile(r'</inproceedings.*>'),
           'wwwout': re.compile(r'</www.*>')}
 

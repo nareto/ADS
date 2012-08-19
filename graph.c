@@ -80,7 +80,6 @@ void author_print(author * athr){
 
 
 void article_short_print(article * artcl){
-
   if(artcl != NULL){
     if(PPRINT)
       printf("\n %10s %d, %s", "\033[1;33mId, Title:\033[0m", artcl->id, artcl->title);
@@ -90,12 +89,11 @@ void article_short_print(article * artcl){
 }
 
 void author_short_print(author * athr){
-
   if(athr != NULL){
     if(PPRINT)
-      printf("\n %10s %d, %s", "\033[1;33mId, Name:\033[0m",  athr->id, athr->name);
+      printf("\n %10s %d, %s", "\033[1;33mId, Name:\033[0m", athr->id, athr->name);
     else
-      printf("\n %10s: %d, %s", "Id, Name",  athr->id, athr->name);
+      printf("\n %10s: %d, %s", "Id, Name", athr->id, athr->name);
   }
 }
 
@@ -408,7 +406,28 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
 	printf("\n \033[1;33mEdge weight:\033[0m %d", gn->weights[j]);
       else
 	printf("\n Edge weight: %d", gn->weights[j]);
-      article_print((article *) gn->neighbours[j]->key);
+      print_article_node(gn->neighbours[j]);
     }
   }
+}
+
+void print_article_node(graph_node * gn){
+  list_node * cur_node;
+  if(gn != NULL){
+    if(PPRINT)
+      printf("\n %19s %s \n %19s %d \n %19s %d \n %19s", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "Authors:");
+    else
+      printf("\n %19s: %s \n %19s: %d \n %19s: %d \n %19s:", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors");
+    if(!list_is_empty(((article *) gn->key)->authors)){
+      cur_node = ((article *)gn->key)->authors->head;
+      while(cur_node != ((article *) gn->key)->authors->tail){
+	if(PPRINT)
+	  printf("\n %19s %d, %d, %s", "\033[1;33mId, Articles, Name:\033[0m",  ((author *) cur_node->key)->id,((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
+	else
+	  printf("\n %19s: %d, %d, %s", "Id, Articles, Name",  ((author *) cur_node->key)->id, ((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
+	cur_node = cur_node->next;
+    }
+    printf("\n");
+  }  
+}
 }

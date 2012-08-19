@@ -89,5 +89,6 @@ graph * new_graph(node_type nt);
 void free_graph(graph * g, int deep); /*if deep>0 free nodes' keys also*/
 void add_node_to_graph(graph_node * gn, graph * g);
 void print_neighbours(graph_node * gn, int depth, int min_weight);
+void print_article_node(graph_node *gn);
 
 #endif

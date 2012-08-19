@@ -8,6 +8,7 @@ void graph_interface(void);
 void flush_input_buffer(void);
 void remove_ending_newline(char * string);
 int line_is_blank(char * line);
+int max(int n,int m);
 
 hash_table * authors_dict;
 graph * artcl_graph;
@@ -32,7 +33,7 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char * line;
-  int block_ended = 1, line_count = 1;
+  int block_ended = 1, line_count = 1, max_edge = 0, tmp;
   unsigned int next_article_id = 0, next_author_id = 0;
   article * temp_article;
   author * temp_author;
@@ -68,27 +69,39 @@ void read_file(FILE * inputfile){
 	  ++next_author_id;
 	  insert_in_hash(temp_author, author_node, authors_dict);
 	}
-	else
+	else{
 	  temp_author = (author *) temp_author_node->key;
 	/*properly update the article's edges in the graph*/
-	if(!list_is_empty(temp_author->articles)){
-	    cur_node = temp_author->articles->head;
-	    while(1){
-	      if((article *) cur_node->key != temp_article)
-		add_edge(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]); /*add edge or increase its weight*/
-	      if(cur_node == temp_author->articles->tail)
-		break;
-	      cur_node = cur_node->next;
+	  cur_node = temp_author->articles->head;
+	  while(1){
+	    if((article *) cur_node->key != temp_article){
+	      add_edge(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]); /*add edge or increase its weight*/
+	      /* tmp = artcl_graph->nodes[((article *) cur_node->key)->id]->n_neighbours; */
+	      /* if(tmp > max_edge || temp_gnode->n_neighbours > max_edge){ */
+	      /*   if(tmp >= temp_gnode->n_neighbours){ */
+	      /*     max_edge = tmp; */
+	      /*     printf("Id: %d \t", ((article *) cur_node->key)->id); */
+	      /*   } */
+	      /*   else{ */
+	      /*     max_edge = temp_gnode->n_neighbours; */
+	      /*     printf("Id: %d \t", ((article *)temp_gnode->key)->id); */
+	      /*   } */
+	      /*   printf("Edges: %d \t Line: %d \n", max_edge, line_count); */
+	      /* } */
 	    }
+	    if(cur_node == temp_author->articles->tail)
+	      break;
+	    cur_node = cur_node->next;
 	  }
-	  add_article_to_author(temp_article, temp_author);
-	  add_author_to_article(temp_author, temp_article);
-	  }
+	}
+	add_article_to_author(temp_article, temp_author);
+	add_author_to_article(temp_author, temp_article);
       }
-      line = fgets(line, MAX_LINE_LENGTH, inputfile);  
     }
-    free(line);
+    line = fgets(line, MAX_LINE_LENGTH, inputfile);  
   }
+  free(line);
+}
 
 void interface(){
   char input;
@@ -180,7 +193,7 @@ void graph_interface(){
       printf("\n Article Id: ");
       flush_input_buffer();
       scanf("%d", &i);
-      article_print(artcl_graph->nodes[i]->key);
+      print_article_node(artcl_graph->nodes[i]);
       break;
     case 'n':
       printf("\n Article Id: ");
@@ -281,4 +294,11 @@ int line_is_blank(char * line){
     }
   }
   return 1;
+}
+
+int max(int n, int m){
+  if(n>=m)
+    return n;
+  else
+    return m;
 }
