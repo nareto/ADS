@@ -91,4 +91,8 @@ void add_node_to_graph(graph_node * gn, graph * g);
 void print_neighbours(graph_node * gn, int depth, int min_weight);
 void print_article_node(graph_node *gn);
 
+int total_edges(graph *g);
+float medium_edges(graph *g);
+graph_node * max_edges(graph *g);
+
 #endif

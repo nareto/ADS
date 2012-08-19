@@ -415,19 +415,48 @@ void print_article_node(graph_node * gn){
   list_node * cur_node;
   if(gn != NULL){
     if(PPRINT)
-      printf("\n %19s %s \n %19s %d \n %19s %d \n %19s", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "Authors:");
+      printf("\n %19s %s \n %19s %d \n %19s %d \n %19s", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "\033[1;33mAuthors:\033[0m");
     else
       printf("\n %19s: %s \n %19s: %d \n %19s: %d \n %19s:", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors");
     if(!list_is_empty(((article *) gn->key)->authors)){
       cur_node = ((article *)gn->key)->authors->head;
-      while(cur_node != ((article *) gn->key)->authors->tail){
+      while(cur_node != NULL){
 	if(PPRINT)
-	  printf("\n %19s %d, %d, %s", "\033[1;33mId, Articles, Name:\033[0m",  ((author *) cur_node->key)->id,((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
+	  printf("\n \t %19s %d, %d, %s", "\033[1;33mId, Articles, Name:\033[0m",  ((author *) cur_node->key)->id,((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
 	else
-	  printf("\n %19s: %d, %d, %s", "Id, Articles, Name",  ((author *) cur_node->key)->id, ((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
+	  printf("\n \t %19s: %d, %d, %s", "Id, Articles, Name",  ((author *) cur_node->key)->id, ((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
 	cur_node = cur_node->next;
-    }
-    printf("\n");
-  }  
+      }
+      printf("\n");
+    }  
+  }
 }
+
+int total_edges(graph *g){
+  long int i, te;
+
+  for(i=0;i<g->n_nodes;++i){
+    te=te + g->nodes[i]->n_neighbours;
+  }
+
+  return te/2;
+}
+
+float medium_edges(graph *g){
+  return total_edges(g)/g->n_nodes;
+}
+
+graph_node *max_edges(graph *g){
+  graph_node * gn;
+  int n,i;
+
+  gn = g->nodes[0];
+  n = gn->n_neighbours;
+  for(i=1;i<g->n_nodes;++i){
+    if(g->nodes[i]->n_neighbours > n){
+      gn = g->nodes[i];
+      n = gn->n_neighbours;
+    }
+  }
+  return gn;
 }
