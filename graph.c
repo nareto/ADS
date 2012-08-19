@@ -61,9 +61,9 @@ void author_print(author * athr){
 
   if(athr != NULL){
     if(PPRINT)
-      printf("\n %10s %s \n %10s %d", "\033[1;33mName:\033[0m", athr->name, "\033[1;33mId:\033[0m", athr->id);
+      printf("\n %10s %s \n %10s %d \n %10s(%d)", "\033[1;33mName:\033[0m", athr->name, "\033[1;33mId:\033[0m", athr->id, "\033[1;33mArticles\033[0m", athr->n_articles);
     else
-      printf("\n %10s: %s \n %10s: %d", "Name", athr->name, "Id", athr->id);
+      printf("\n %10s: %s \n %10s: %d \n %10s(%d):", "Name", athr->name, "Id", athr->id, "Articles", athr->n_articles);
     if(!list_is_empty(athr->articles)){
       cur_node = athr->articles->head;
       while(1){
@@ -82,9 +82,9 @@ void author_print(author * athr){
 void article_short_print(article * artcl){
   if(artcl != NULL){
     if(PPRINT)
-      printf("\n %10s %d, %s", "\033[1;33mId, Title:\033[0m", artcl->id, artcl->title);
+      printf("\n \t %10s %d, %s", "\033[1;33mId, Title:\033[0m", artcl->id, artcl->title);
     else
-      printf("\n %10s: %d, %s", "Id, Title", artcl->id, artcl->title);
+      printf("\n \t %10s: %d, %s", "Id, Title", artcl->id, artcl->title);
   }
 }
 
@@ -433,7 +433,7 @@ void print_article_node(graph_node * gn){
 }
 
 int total_edges(graph *g){
-  long int i, te;
+  long int i, te=0;
 
   for(i=0;i<g->n_nodes;++i){
     te=te + g->nodes[i]->n_neighbours;
