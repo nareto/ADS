@@ -23,6 +23,9 @@ WORK_OUTS={'articleout': re.compile(r'</article.*>'),
           'inproceedingsout': re.compile(r'</inproceedings.*>'),
           'wwwout': re.compile(r'</www.*>')}
 
+#WORK_INS={'articlein': re.compile(r'<article.*?>')}
+#WORK_OUTS={'articleout': re.compile(r'</article.*>')}
+
 PATTERNS={'authorin': re.compile(r'<author.*?>'),
           'authorout': re.compile(r'</author.*>'),
           'titlein': re.compile(r'<title.*?>(?!Home Page)'),
