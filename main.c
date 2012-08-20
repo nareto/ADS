@@ -52,7 +52,7 @@ void read_file(FILE * inputfile){
     line = fgets(line, MAX_LINE_LENGTH, inputfile);
     ++line_count;
   }
-  printf("Reading file: ");
+  printf("Creating article graph: ");
   fflush(stdout);
   while(line != NULL){
     next_perc = (float) line_count / (float) total_lines;
