@@ -238,6 +238,11 @@ void graph_interface(){
       printf("\n Minimum edge weight: ");
       flush_input_buffer();
       scanf("%d", &min_weight);
+      if(clst != NULL){
+	free(clst->representatives);
+	free(clst->nodes_in_cluster);
+	free(clst);
+      }
       clst = find_clusters(artcl_graph, min_weight);
       break;
     case 'r':

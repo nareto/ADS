@@ -145,8 +145,9 @@ void remove_list_node(list *l ,list_node *ln, int deep){
 
   if(ln == l->head){
     if(ln == l->tail){
-      free(ln);
-      free(l);
+      ln->key = NULL;
+      ln->next = NULL;
+      --l->length;
       return;
     }
     l->head=ln->next;
@@ -165,6 +166,7 @@ void remove_list_node(list *l ,list_node *ln, int deep){
     }
     free(ln);
   }
+  --l->length;
 }
 
 void free_list(list* the_list, int deep){
@@ -182,11 +184,7 @@ void free_list(list* the_list, int deep){
 }
 
 int list_is_empty(list *l){
-  /* if(l->head == l->tail && l->n_type == empty_node) */
-  /*   return 1; */
-  /* else */
-  /*   return 0; */
-  if(l->length == 0)
+  if(l->length == 0 || l->head->key == NULL)
     return 1;
   else
     return 0;
@@ -194,15 +192,12 @@ int list_is_empty(list *l){
 
 int is_in_list(list *l, void * key){
   list_node * cur_node;
-  /* switch(l->n_type){ */
-  /* case article_node: */
-  /*   key = (article *) key; */
-  /*   break; */
-  /* } */
 
-  for(cur_node = l->head; cur_node->next != NULL; cur_node = cur_node->next){
-    if(cur_node->key == key){
-      return 1;
+  if(!list_is_empty(l)){
+    for(cur_node = l->head; cur_node != NULL; cur_node = cur_node->next){
+      if(cur_node->key == key){
+	return 1;
+      }
     }
   }
   return 0;
@@ -245,7 +240,7 @@ list_node * is_in_list_by_string(list *l, char * string){
 void list_insert_after(list * the_list, list_node *n, void * key) {
   list_node *new_node;
 
-  if(the_list->length == 0){/*there is only the head (== tail) created by new_list*/
+  if(list_is_empty(the_list)){/*there is only the head (== tail) created by new_list*/
     new_node = the_list->head;
   }
   else{
@@ -291,6 +286,9 @@ void list_print(list * the_list){
       break;
     case author_node:
       author_print(cur_node->key);
+      break;
+    case generic_graph_node:
+      print_article_node(cur_node->key);
       break;
     default:
       break;
@@ -426,33 +424,34 @@ void add_node_to_graph(graph_node * gn, graph * g){
 void print_neighbours(graph_node * gn, int depth, int min_weight){
   int i, visit_depth=0;
   list * queue, * visited;
-  list_node * cur_node, *head;
+  list_node * cur_node;
   graph_node * cur_gn;
 
   visited = new_list(generic_graph_node);
   queue = new_list(generic_graph_node);
   list_insert(queue, gn);
-  head = queue->head;
 
-  while(head != NULL && (visit_depth < depth || depth == -1)){
-    cur_node = head;
+  while(!list_is_empty(queue) && (visit_depth < depth || depth == -1)){
+    cur_node = queue->head; /*dequeue*/
     cur_gn = (graph_node *) cur_node->key;
+    remove_list_node(queue, queue->head, 0);
     if(!is_in_list(visited, cur_gn)){
       list_insert(visited, cur_gn);
+      if(PPRINT)
+	printf("\n %s %d", "\033[1;33mDistance from source (hops):\033[0m", visit_depth);
+      else
+	printf("\n %s %d", "Distance from source (hops):", visit_depth);
+      print_article_node(cur_gn);      
       for(i=0; i < cur_gn->n_neighbours; ++i){
 	if(cur_gn->weights[i] >= min_weight){
-	  if(PPRINT)
-	    printf("\n %s %d", "\033[1;33mDistance from source (hops):\033[0m", visit_depth + 1);
-	  else
-	    printf("\n %s %d", "Distance from source (hops):", visit_depth + 1);
-	  print_article_node(cur_gn->neighbours[i]);
 	  list_insert(queue, cur_gn->neighbours[i]);
 	}
       }
     }
-    head = cur_node->next;
     ++visit_depth;
   }
+  free_list(visited,0);
+  free_list(queue,0);
 }
 
 void print_article_node(graph_node * gn){
