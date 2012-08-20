@@ -524,7 +524,7 @@ clusters * find_clusters(graph *g, int min_weight){
   for(j=0;j<g->n_nodes;++j){
     if(!checked_ids[j]){/*g->nodes[j] is part of a new cluster*/
       checked_ids[j] = 1;
-      nodes_in_cluster=1;
+      nodes_in_cluster=0;
       max_edge = 0;
 
       visited = new_list(generic_graph_node);

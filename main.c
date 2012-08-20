@@ -244,6 +244,7 @@ void graph_interface(){
 	free(clst);
       }
       clst = find_clusters(artcl_graph, min_weight);
+      printf("\n %d clusters found", clst->n_rpr);
       break;
     case 'r':
       if(clst != NULL){
