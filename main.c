@@ -159,7 +159,7 @@ void interface(){
 void graph_interface(){
   char input, string[MAX_LINE_LENGTH];
   list_node * ln;
-  int end=0, i, min_weight = 1, bfs_depth;
+  int end=0, i, min_weight = 1, bfs_depth, min_nodes = 0;
   clusters * clst;
   clst = NULL;
 
@@ -252,13 +252,18 @@ void graph_interface(){
       printf("\n %d clusters found", clst->n_rpr);
       break;
     case 'r':
+      printf("\n Minimum nodes in cluster: ");
+      flush_input_buffer();
+      scanf("%d", &min_nodes);
       if(clst != NULL){
 	for(i=0;i<clst->n_rpr;++i){
-	  if(PPRINT)
-	    printf("\n \033[1;32mCluster %d has %d nodes. Representative:\033[0m", i, clst->nodes_in_cluster[i]);
-	  else
-	    printf("\n Cluster %d has %d nodes. Representative:", i, clst->nodes_in_cluster[i]);
-	  print_article_node(clst->representatives[i]);
+	  if(clst->nodes_in_cluster[i]>= min_nodes){
+	    if(PPRINT)
+	      printf("\n \033[1;32mCluster %d has %d nodes. Representative:\033[0m", i, clst->nodes_in_cluster[i]);
+	    else
+	      printf("\n Cluster %d has %d nodes. Representative:", i, clst->nodes_in_cluster[i]);
+	    print_article_node(clst->representatives[i]);
+	  }
 	}
       }
       break;
