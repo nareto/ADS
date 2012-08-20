@@ -507,7 +507,7 @@ graph_node *max_edges(graph *g){
 clusters * find_clusters(graph *g, int min_weight){
   int i,j, nodes_in_cluster, max_edge;
   list * queue, * visited;
-  list_node * cur_node, *head;
+  list_node * cur_node;
   graph_node * cur_gn, *rpr;
   clusters * clst;
   char checked_ids[g->n_nodes];
@@ -530,24 +530,25 @@ clusters * find_clusters(graph *g, int min_weight){
       visited = new_list(generic_graph_node);
       queue = new_list(generic_graph_node);
       list_insert(queue, g->nodes[j]);
-      head = queue->head;
 
-      while(head != NULL){/*BFS*/
-	cur_node = head;
+      while(!list_is_empty(queue)){/*BFS*/
+	cur_node = queue->head; /*dequeue*/
 	cur_gn = (graph_node *) cur_node->key;
+	remove_list_node(queue, queue->head,0);
 	if(!is_in_list(visited, cur_gn)){
 	  list_insert(visited, cur_gn);
+	  nodes_in_cluster++;
+	  checked_ids[((article*) cur_gn->key)->id] = 1;
+	  if(cur_gn->n_neighbours > max_edge){ /*let's choose as representative of the cluster the node with more outgoing edges*/
+	    rpr = cur_gn;
+	    max_edge = cur_gn->n_neighbours;
+	  }
 	  for(i=0; i < cur_gn->n_neighbours; ++i){
 	    if(cur_gn->weights[i] >= min_weight){
-	      nodes_in_cluster++;
-	      checked_ids[((article*) cur_gn->neighbours[i]->key)->id] = 1;
 	      list_insert(queue, cur_gn->neighbours[i]);
-	      if(cur_gn->neighbours[i]->n_neighbours > max_edge) /*let's choose as representative of the cluster the node with more outgoing edges*/
-		rpr = cur_gn->neighbours[i];
 	    }
 	  }
 	}
-	head = cur_node->next;
       }
       if(nodes_in_cluster > 1){
 	++clst->n_rpr;
