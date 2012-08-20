@@ -76,18 +76,6 @@ void read_file(FILE * inputfile){
 	  while(1){
 	    if((article *) cur_node->key != temp_article){
 	      add_edge(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]); /*add edge or increase its weight*/
-	      /* tmp = artcl_graph->nodes[((article *) cur_node->key)->id]->n_neighbours; */
-	      /* if(tmp > max_edge || temp_gnode->n_neighbours > max_edge){ */
-	      /*   if(tmp >= temp_gnode->n_neighbours){ */
-	      /*     max_edge = tmp; */
-	      /*     printf("Id: %d \t", ((article *) cur_node->key)->id); */
-	      /*   } */
-	      /*   else{ */
-	      /*     max_edge = temp_gnode->n_neighbours; */
-	      /*     printf("Id: %d \t", ((article *)temp_gnode->key)->id); */
-	      /*   } */
-	      /*   printf("Edges: %d \t Line: %d \n", max_edge, line_count); */
-	      /* } */
 	    }
 	    if(cur_node == temp_author->articles->tail)
 	      break;
@@ -157,7 +145,7 @@ void interface(){
 void graph_interface(){
   char input, string[MAX_LINE_LENGTH];
   list_node * ln;
-  int end=0, i, min_weight = 1;
+  int end=0, i, min_weight = 1, bfs_depth;
 
   while(!end){
     if(PPRINT){
@@ -208,7 +196,10 @@ void graph_interface(){
       printf("\n Minimum edge weight: ");
       flush_input_buffer();
       scanf("%d", &min_weight);
-      print_neighbours(artcl_graph->nodes[i], 1, min_weight);
+      printf("\n Depth of search: ");
+      flush_input_buffer();
+      scanf("%d", &bfs_depth);
+      print_neighbours(artcl_graph->nodes[i], bfs_depth, min_weight);
       break;    
     case 'c':
       printf("\n %d Articles", artcl_graph->n_nodes);

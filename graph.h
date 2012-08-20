@@ -11,7 +11,7 @@
 #define MAX_LINE_LENGTH 1000
 
 /* STRUCTS */
-typedef enum node_type_t {empty_node, article_node, author_node, other_node} node_type;
+typedef enum node_type_t {empty_node, article_node, author_node, other_node, generic_graph_node} node_type;
 typedef struct article_t article; 
 typedef struct author_t author; 
 typedef struct list_t list;
@@ -75,7 +75,8 @@ list * new_list(node_type nt);
 void remove_list_node(list * l, list_node * ln, int deep);/*if deep>0 free the key also*/
 void free_list(list * l, int deep);/*if the deep > 0 free nodes' keys also*/
 int list_is_empty(list *l);
-list_node * is_in_list(list *l, char * string);/*string is, depending on nt, the article's title or the author's name*/
+int is_in_list(list *l, void * key); 
+list_node * is_in_list_by_string(list *l, char * string);/*string is, depending on nt, the article's title or the author's name*/
 void list_insert_after(list * l, list_node * n, void * key);
 void list_insert(list *l, void * key); /*inserts at the end of the list*/
 void list_print(list *l);

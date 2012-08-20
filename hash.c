@@ -53,7 +53,7 @@ void insert_in_hash(void *key, node_type nt, hash_table *ht){
 }
 
 list_node * search_in_hash(char * key, hash_table *ht){
-  return is_in_list(ht->array[hashf(key,ht->modulo)], key); 
+  return is_in_list_by_string(ht->array[hashf(key,ht->modulo)], key); 
 }
 
 void print_hash_histogram(hash_table *ht, int unit){

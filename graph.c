@@ -181,7 +181,23 @@ int list_is_empty(list *l){
     return 0;
 }
 
-list_node * is_in_list(list *l, char * string){
+int is_in_list(list *l, void * key){
+  list_node * cur_node;
+  /* switch(l->n_type){ */
+  /* case article_node: */
+  /*   key = (article *) key; */
+  /*   break; */
+  /* } */
+
+  for(cur_node = l->head; cur_node->next != NULL; cur_node = cur_node->next){
+    if(cur_node->key == key){
+      return 1;
+    }
+  }
+  return 0;
+}
+
+list_node * is_in_list_by_string(list *l, char * string){
   list_node * cur_node;
   int j=0;
  
@@ -238,6 +254,9 @@ void list_insert_after(list * the_list, list_node *n, void * key) {
     break;
   case author_node:
     new_node->key = (author *) key;
+    break;
+  case generic_graph_node:
+    new_node->key = (graph_node *) key;
     break;
   default:
     new_node->key = key;
@@ -394,20 +413,34 @@ void add_node_to_graph(graph_node * gn, graph * g){
 }
 
 void print_neighbours(graph_node * gn, int depth, int min_weight){
-  int j;
+  int i, visit_depth=0;
+  list * queue, * visited;
+  list_node * cur_node, *head;
+  graph_node * cur_gn;
 
-  if(depth > 1){
-    printf("Not yet implemented with depth > 1");
-  }
+  visited = new_list(generic_graph_node);
+  queue = new_list(generic_graph_node);
+  list_insert(queue, gn);
+  head = queue->head;
 
-  for(j=0;j<gn->n_neighbours; ++j){
-    if(gn->weights[j] >= min_weight){
-      if(PPRINT)
-	printf("\n \033[1;33mEdge weight:\033[0m %d", gn->weights[j]);
-      else
-	printf("\n Edge weight: %d", gn->weights[j]);
-      print_article_node(gn->neighbours[j]);
+  while(!list_is_empty(queue) && visit_depth < depth){
+    cur_node = head;
+    cur_gn = (graph_node *) cur_node->key;
+    if(!is_in_list(visited, cur_gn)){
+      list_insert(visited, cur_gn);
+      for(i=0; i < cur_gn->n_neighbours; ++i){
+	if(cur_gn->weights[i] >= min_weight){
+	  if(PPRINT)
+	    printf("\n \033[1;33mEdge weight:\033[0m %d", cur_gn->weights[i]);
+	  else
+	    printf("\n Edge weight: %d", cur_gn->weights[i]);
+	  print_article_node(cur_gn->neighbours[i]);
+	  list_insert(queue, cur_gn->neighbours[i]);
+	}
+      }
     }
+    head = cur_node->next;
+    ++visit_depth;
   }
 }
 
