@@ -165,7 +165,7 @@ void graph_interface(){
 
   while(!end){
     if(PPRINT){
-      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "\033[1;32ma\033[0m", "print an author and its articles",
 	     "\033[1;32mA\033[0m", "print an article and its authors",
 	     "\033[1;32mn\033[0m", "print an article and its neighbors in the article graph",
@@ -173,12 +173,13 @@ void graph_interface(){
 	     "\033[1;32mt\033[0m", "print the graph total edges",
 	     "\033[1;32mm\033[0m", "print the graph nodes' medium edges",
 	     "\033[1;32mM\033[0m", "print the graph nodes' max_edges",
+	     "\033[1;32mw\033[0m", "print the edge mean weight",
 	     "\033[1;32mC\033[0m", "calculate clusters",
 	     "\033[1;32mr\033[0m", "print representatives from last calculated clusters",
 	     "\033[1;32mq\033[0m", "return to main menu");
     }
     else{
-      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "a", "print an author and its articles",
 	     "A", "print an article and its authors",
 	     "n", "print an article and its neighbors in the article graph",
@@ -186,6 +187,7 @@ void graph_interface(){
 	     "t", "print the graph total edges",
 	     "m", "print the graph nodes' medium edges",
 	     "M", "print the graph nodes' max_edges",
+	     "w", "print the edge mean weight",
 	     "C", "calculate clusters",
 	     "r", "print representatives from last calculated clusters",
 	     "q", "return to main menu");
@@ -228,11 +230,14 @@ void graph_interface(){
       printf("\n %d edges in the article graph", total_edges(artcl_graph));
       break;
     case 'm':
-      printf("\n Articles in the graph have %f edges in mean", medium_edges(artcl_graph)); 
+      printf("\n Articles in the graph have %f edges in mean", mean_edges(artcl_graph)); 
       break;
     case 'M':
       printf("\n The article with the biggest number of edges is:");
       print_article_node(max_edges(artcl_graph));
+      break;
+    case 'w':
+      printf("\n The mean edge weight is: %f", mean_edge_weight(artcl_graph));
       break;
     case 'C':
       printf("\n Minimum edge weight: ");

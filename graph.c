@@ -485,7 +485,7 @@ int total_edges(graph *g){
   return te/2;
 }
 
-float medium_edges(graph *g){
+float mean_edges(graph *g){
   return ((float) total_edges(g)/ (float) g->n_nodes);
 }
 
@@ -502,6 +502,17 @@ graph_node *max_edges(graph *g){
     }
   }
   return gn;
+}
+
+float mean_edge_weight(graph *g){
+  long unsigned int tot_weight=0;
+  int i,j;
+  for(i=0;i<g->n_nodes;++i){
+    for(j=0;j<g->nodes[i]->n_neighbours;++j){
+      tot_weight = tot_weight + g->nodes[i]->weights[j];
+    }
+  }
+  return (float) ((long double) tot_weight / (float) total_edges(g));
 }
 
 clusters * find_clusters(graph *g, int min_weight){
