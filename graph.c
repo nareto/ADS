@@ -506,29 +506,29 @@ graph_node *max_edges(graph *g){
 }
 
 clusters * find_clusters(graph *g, int min_weight){
-  int i,j, visit_depth=0, n_rpr = 0;
+  int i,j, no_neighbours;
   list * queue, * visited;
   list_node * cur_node, *head;
-  graph_node * cur_gn, ** rpr;
+  graph_node * cur_gn;
   clusters * clst;
   char checked_ids[g->n_nodes];
 
   clst = (clusters *) malloc(sizeof(clusters));
   clst->min_weight = min_weight;
+  clst->representatives = (graph_node **) malloc(sizeof(graph_node *));
+  clst->n_rpr = 0;
 
-  rpr = (graph_node **) malloc(sizeof(graph_node *));
   for(j=0;j<g->n_nodes;++j)
     checked_ids[j] = 0;
 
   for(j=0;j<g->n_nodes;++j){
     if(!checked_ids[j]){
-      ++n_rpr;
-      rpr = (graph_node **) realloc(rpr, n_rpr*sizeof(graph_node*));
-      rpr[n_rpr - 1] = g->nodes[j];
+      checked_ids[j] = 1;
+      no_neighbours=1;
 
       visited = new_list(generic_graph_node);
       queue = new_list(generic_graph_node);
-      list_insert(queue, max_edges(g));
+      list_insert(queue, g->nodes[j]);
       head = queue->head;
 
       while(head != NULL){/*BFS*/
@@ -538,18 +538,22 @@ clusters * find_clusters(graph *g, int min_weight){
 	  list_insert(visited, cur_gn);
 	  for(i=0; i < cur_gn->n_neighbours; ++i){
 	    if(cur_gn->weights[i] >= min_weight){
+	      no_neighbours=0;
 	      checked_ids[((article*) cur_gn->neighbours[i]->key)->id] = 1;
 	      list_insert(queue, cur_gn->neighbours[i]);
 	    }
 	  }
 	}
 	head = cur_node->next;
-	++visit_depth;
+      }
+      if(!no_neighbours){
+	++clst->n_rpr;
+	clst->representatives= (graph_node **) realloc(clst->representatives, clst->n_rpr*sizeof(graph_node*));
+	clst->representatives[clst->n_rpr - 1] = g->nodes[j];
       }
       free_list(visited,0);
       free_list(queue,0);
     }
   }
-  clst->n_rpr = n_rpr;
   return clst;
 }
