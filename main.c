@@ -107,24 +107,19 @@ void read_file(FILE * inputfile){
 
 void interface(){
   char input;
-  int end = 0, deep = 0;
-  char string[MAX_LINE_LENGTH];
+  int end = 0;
 
   while(!end){
     if(PPRINT){
-      printf("\n \033[1;31mCommands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n \033[1;31mCommands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "\033[1;32mh\033[0m", "hash table submenu",
 	     "\033[1;32mg\033[0m", "graph submenu",
-	     "\033[1;32mf\033[0m", "free all the lists in the authors hash table",
-	     "\033[1;32mF\033[0m", "free the article graph",
 	     "\033[1;32mq\033[0m", "quit");
     }
     else{
-      printf("\n Commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n Commands:  \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "h", "hash table submenu",
 	     "g", "graph submenu",
-	     "f", "free all the lists in the authors hash table",
-	     "F", "free the article graph",
 	     "q", "quit");
     }
     scanf(" %c", &input);
@@ -135,21 +130,7 @@ void interface(){
     case 'g':
       graph_interface();
       break;
-    case 'f':
-      printf("\n do you want to free also the authors struct? (1=yes, 0=no): ");    
-      flush_input_buffer();
-      fgets(string, MAX_LINE_LENGTH, stdin);
-      deep = atoi(string);
-      free_hash_table(authors_dict, deep);
-      break;
-    case 'F':
-      printf("\n do you want to free also the articles struct? (1=yes, 0=no): ");    
-      flush_input_buffer();
-      fgets(string, MAX_LINE_LENGTH, stdin);
-      deep = atoi(string);
-      /* article_graph_free(artcl_gr, deep); */
-      break;      
-    case 'q':
+     case 'q':
       end = 1;
       break;
     }
