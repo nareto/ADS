@@ -21,15 +21,15 @@ struct author_t {
   char * name;
   list * articles;
   unsigned int id;
-  int n_articles;
-};
+  short int n_articles;
+}__attribute__((__packed__));
 
 struct article_t {
   char * title;
   list * authors;
   unsigned int id;
-  int n_authors;
-};
+  char n_authors;
+}__attribute__((__packed__));
 
 /*LISTE*/
 typedef struct list_node_t {
@@ -40,16 +40,18 @@ typedef struct list_node_t {
 struct list_t {
   node_type n_type;
   list_node * head, *tail;
-  int length;
-};
+  short int length;
+}__attribute__((__packed__));
 
 /* GRAFI */
-typedef struct graph_node_t {
+struct graph_node_t {
   void * key;
-  int n_neighbours;
+  short int n_neighbours;
   struct graph_node_t ** neighbours;
   char * weights;
-} graph_node;
+} __attribute__((__packed__));
+
+typedef struct graph_node_t graph_node;
 
 
 typedef struct graph_t {
