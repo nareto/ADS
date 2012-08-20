@@ -58,6 +58,12 @@ typedef struct graph_t {
   unsigned int n_nodes;
 } graph;
 
+typedef struct clusters_t {
+  graph_node ** representatives;
+  int n_rpr;
+  int min_weight;
+} clusters;
+
 /* FUNCTIONS  */
 article * new_article(char * title, int id);
 author * new_author(char * name, int id);
@@ -96,6 +102,6 @@ int total_edges(graph *g);
 float medium_edges(graph *g);
 graph_node * max_edges(graph *g);
 
-/* graph_node ** find_clusters(graph * g, int min_weight); */
+clusters * find_clusters(graph * g, int min_weight);
 
 #endif

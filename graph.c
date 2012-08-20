@@ -142,18 +142,29 @@ void remove_list_node(list *l ,list_node *ln, int deep){
       break;
     }
   }
-  
-  while(prev_node->next != ln){
-    prev_node = prev_node->next;
-  }
-  if(ln == l->tail){
-    prev_node->next = NULL;
-    l->tail = prev_node;
+
+  if(ln == l->head){
+    if(ln == l->tail){
+      free(ln);
+      free(l);
+      return;
+    }
+    l->head=ln->next;
+    free(ln);
   }
   else{
-    prev_node->next = ln->next;
+    while(prev_node->next != ln){
+      prev_node = prev_node->next;
+    }
+    if(ln == l->tail){
+      prev_node->next = NULL;
+      l->tail = prev_node;
+    }
+    else{
+      prev_node->next = ln->next;
+    }
+    free(ln);
   }
-  free(ln);
 }
 
 void free_list(list* the_list, int deep){
@@ -494,29 +505,51 @@ graph_node *max_edges(graph *g){
   return gn;
 }
 
-/* graph_node ** find_clusters(graph *g, int min_weight){ */
-/*   int i, visit_depth=0; */
-/*   list * queue, * visited; */
-/*   list_node * cur_node, *head; */
-/*   graph_node * cur_gn; */
+clusters * find_clusters(graph *g, int min_weight){
+  int i,j, visit_depth=0, n_rpr = 0;
+  list * queue, * visited;
+  list_node * cur_node, *head;
+  graph_node * cur_gn, ** rpr;
+  clusters * clst;
+  char checked_ids[g->n_nodes];
 
-/*   visited = new_list(generic_graph_node); */
-/*   queue = new_list(generic_graph_node); */
-/*   list_insert(queue, max_edges(g)); */
-/*   head = queue->head; */
+  clst = (clusters *) malloc(sizeof(clusters));
+  clst->min_weight = min_weight;
 
-/*   while(head != NULL){ */
-/*     cur_node = head; */
-/*     cur_gn = (graph_node *) cur_node->key; */
-/*     if(!is_in_list(visited, cur_gn)){ */
-/*       list_insert(visited, cur_gn); */
-/*       for(i=0; i < cur_gn->n_neighbours; ++i){ */
-/* 	if(cur_gn->weights[i] >= min_weight){ */
-/* 	  list_insert(queue, cur_gn->neighbours[i]); */
-/* 	} */
-/*       } */
-/*     } */
-/*     head = cur_node->next; */
-/*     ++visit_depth; */
-/*   } */
-/* } */
+  rpr = (graph_node **) malloc(sizeof(graph_node *));
+  for(j=0;j<g->n_nodes;++j)
+    checked_ids[j] = 0;
+
+  for(j=0;j<g->n_nodes;++j){
+    if(!checked_ids[j]){
+      ++n_rpr;
+      rpr = (graph_node **) realloc(rpr, n_rpr*sizeof(graph_node*));
+      rpr[n_rpr - 1] = g->nodes[j];
+
+      visited = new_list(generic_graph_node);
+      queue = new_list(generic_graph_node);
+      list_insert(queue, max_edges(g));
+      head = queue->head;
+
+      while(head != NULL){/*BFS*/
+	cur_node = head;
+	cur_gn = (graph_node *) cur_node->key;
+	if(!is_in_list(visited, cur_gn)){
+	  list_insert(visited, cur_gn);
+	  for(i=0; i < cur_gn->n_neighbours; ++i){
+	    if(cur_gn->weights[i] >= min_weight){
+	      checked_ids[((article*) cur_gn->neighbours[i]->key)->id] = 1;
+	      list_insert(queue, cur_gn->neighbours[i]);
+	    }
+	  }
+	}
+	head = cur_node->next;
+	++visit_depth;
+      }
+      free_list(visited,0);
+      free_list(queue,0);
+    }
+  }
+  clst->n_rpr = n_rpr;
+  return clst;
+}
