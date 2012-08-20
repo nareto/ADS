@@ -423,7 +423,7 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
   list_insert(queue, gn);
   head = queue->head;
 
-  while(!list_is_empty(queue) && visit_depth < depth){
+  while(head != NULL && visit_depth < depth){
     cur_node = head;
     cur_gn = (graph_node *) cur_node->key;
     if(!is_in_list(visited, cur_gn)){
@@ -431,9 +431,9 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
       for(i=0; i < cur_gn->n_neighbours; ++i){
 	if(cur_gn->weights[i] >= min_weight){
 	  if(PPRINT)
-	    printf("\n \033[1;33mEdge weight:\033[0m %d", cur_gn->weights[i]);
+	    printf("\n %s %d", "\033[1;33mDistance from source (hops):\033[0m", visit_depth + 1);
 	  else
-	    printf("\n Edge weight: %d", cur_gn->weights[i]);
+	    printf("\n %s %d", "Distance from source (hops):", visit_depth + 1);
 	  print_article_node(cur_gn->neighbours[i]);
 	  list_insert(queue, cur_gn->neighbours[i]);
 	}
@@ -448,9 +448,9 @@ void print_article_node(graph_node * gn){
   list_node * cur_node;
   if(gn != NULL){
     if(PPRINT)
-      printf("\n %19s %s \n %19s %d \n %19s %d \n %19s", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "\033[1;33mAuthors:\033[0m");
+      printf("\n %22s %s \n %22s %d \n %22s %d \n %22s", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "\033[1;33mAuthors:\033[0m");
     else
-      printf("\n %19s: %s \n %19s: %d \n %19s: %d \n %19s:", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors");
+      printf("\n %22s: %s \n %22s: %d \n %22s: %d \n %22s:", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors");
     if(!list_is_empty(((article *) gn->key)->authors)){
       cur_node = ((article *)gn->key)->authors->head;
       while(cur_node != NULL){
