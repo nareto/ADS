@@ -96,4 +96,6 @@ int total_edges(graph *g);
 float medium_edges(graph *g);
 graph_node * max_edges(graph *g);
 
+/* graph_node ** find_clusters(graph * g, int min_weight); */
+
 #endif

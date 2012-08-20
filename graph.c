@@ -493,3 +493,30 @@ graph_node *max_edges(graph *g){
   }
   return gn;
 }
+
+/* graph_node ** find_clusters(graph *g, int min_weight){ */
+/*   int i, visit_depth=0; */
+/*   list * queue, * visited; */
+/*   list_node * cur_node, *head; */
+/*   graph_node * cur_gn; */
+
+/*   visited = new_list(generic_graph_node); */
+/*   queue = new_list(generic_graph_node); */
+/*   list_insert(queue, max_edges(g)); */
+/*   head = queue->head; */
+
+/*   while(head != NULL){ */
+/*     cur_node = head; */
+/*     cur_gn = (graph_node *) cur_node->key; */
+/*     if(!is_in_list(visited, cur_gn)){ */
+/*       list_insert(visited, cur_gn); */
+/*       for(i=0; i < cur_gn->n_neighbours; ++i){ */
+/* 	if(cur_gn->weights[i] >= min_weight){ */
+/* 	  list_insert(queue, cur_gn->neighbours[i]); */
+/* 	} */
+/*       } */
+/*     } */
+/*     head = cur_node->next; */
+/*     ++visit_depth; */
+/*   } */
+/* } */

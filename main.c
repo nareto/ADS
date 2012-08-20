@@ -33,7 +33,8 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char * line;
-  int block_ended = 1, line_count = 1, max_edge = 0, tmp;
+  int block_ended = 1, line_count = 0, total_lines = 0, i = 1;
+  float next_perc;
   unsigned int next_article_id = 0, next_author_id = 0;
   article * temp_article;
   author * temp_author;
@@ -41,13 +42,25 @@ void read_file(FILE * inputfile){
   graph_node * temp_gnode;
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
+  while(fgets(line, MAX_LINE_LENGTH, inputfile) != NULL)
+    ++total_lines;
+
+  rewind(inputfile);
   line = fgets(line, MAX_LINE_LENGTH, inputfile);
+  ++line_count;
   while(line_is_blank(line)){ /*remove leading white lines*/
-    ++line_count;
     line = fgets(line, MAX_LINE_LENGTH, inputfile);
-  }
-  while(line != NULL){
     ++line_count;
+  }
+  printf("Reading file: ");
+  fflush(stdout);
+  while(line != NULL){
+    next_perc = (float) line_count / (float) total_lines;
+    if(next_perc  > ((float) i /10.0)){
+      printf("%d%%...",10*i);
+      fflush(stdout);
+      ++i;
+    }
     if(block_ended && !line_is_blank(line)){ /*a new article/authors block begins*/
       remove_ending_newline(line);
       block_ended = 0;
@@ -87,6 +100,7 @@ void read_file(FILE * inputfile){
       }
     }
     line = fgets(line, MAX_LINE_LENGTH, inputfile);  
+    ++line_count;
   }
   free(line);
 }
