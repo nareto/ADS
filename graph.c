@@ -434,7 +434,7 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
   list_insert(queue, gn);
   head = queue->head;
 
-  while(head != NULL && visit_depth < depth){
+  while(head != NULL && (visit_depth < depth || depth == -1)){
     cur_node = head;
     cur_gn = (graph_node *) cur_node->key;
     if(!is_in_list(visited, cur_gn)){
@@ -459,9 +459,9 @@ void print_article_node(graph_node * gn){
   list_node * cur_node;
   if(gn != NULL){
     if(PPRINT)
-      printf("\n %22s %s \n %22s %d \n %22s %d \n %22s", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "\033[1;33mAuthors:\033[0m");
+      printf("\n %22s %s \n %22s %d \n %22s %d \n %22s(%d)", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "\033[1;33mAuthors\033[0m", ((article *) gn->key)->n_authors);
     else
-      printf("\n %22s: %s \n %22s: %d \n %22s: %d \n %22s:", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors");
+      printf("\n %22s: %s \n %22s: %d \n %22s: %d \n %22s(%d)", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors", ((article *) gn->key)->n_authors);
     if(!list_is_empty(((article *) gn->key)->authors)){
       cur_node = ((article *)gn->key)->authors->head;
       while(cur_node != NULL){
@@ -506,25 +506,27 @@ graph_node *max_edges(graph *g){
 }
 
 clusters * find_clusters(graph *g, int min_weight){
-  int i,j, no_neighbours;
+  int i,j, nodes_in_cluster, max_edge;
   list * queue, * visited;
   list_node * cur_node, *head;
-  graph_node * cur_gn;
+  graph_node * cur_gn, *rpr;
   clusters * clst;
   char checked_ids[g->n_nodes];
 
   clst = (clusters *) malloc(sizeof(clusters));
-  clst->min_weight = min_weight;
   clst->representatives = (graph_node **) malloc(sizeof(graph_node *));
+  clst->nodes_in_cluster = (int *) malloc(sizeof(int));
+  clst->min_weight = min_weight;
   clst->n_rpr = 0;
 
   for(j=0;j<g->n_nodes;++j)
     checked_ids[j] = 0;
 
   for(j=0;j<g->n_nodes;++j){
-    if(!checked_ids[j]){
+    if(!checked_ids[j]){/*g->nodes[j] is part of a new cluster*/
       checked_ids[j] = 1;
-      no_neighbours=1;
+      nodes_in_cluster=1;
+      max_edge = 0;
 
       visited = new_list(generic_graph_node);
       queue = new_list(generic_graph_node);
@@ -538,18 +540,22 @@ clusters * find_clusters(graph *g, int min_weight){
 	  list_insert(visited, cur_gn);
 	  for(i=0; i < cur_gn->n_neighbours; ++i){
 	    if(cur_gn->weights[i] >= min_weight){
-	      no_neighbours=0;
+	      nodes_in_cluster++;
 	      checked_ids[((article*) cur_gn->neighbours[i]->key)->id] = 1;
 	      list_insert(queue, cur_gn->neighbours[i]);
+	      if(cur_gn->neighbours[i]->n_neighbours > max_edge) /*let's choose as representative of the cluster the node with more outgoing edges*/
+		rpr = cur_gn->neighbours[i];
 	    }
 	  }
 	}
 	head = cur_node->next;
       }
-      if(!no_neighbours){
+      if(nodes_in_cluster > 1){
 	++clst->n_rpr;
 	clst->representatives= (graph_node **) realloc(clst->representatives, clst->n_rpr*sizeof(graph_node*));
-	clst->representatives[clst->n_rpr - 1] = g->nodes[j];
+	clst->representatives[clst->n_rpr - 1] = rpr;
+	clst->nodes_in_cluster = (int *) realloc(clst->nodes_in_cluster, clst->n_rpr*sizeof(int));
+	clst->nodes_in_cluster[clst->n_rpr - 1] = nodes_in_cluster;
       }
       free_list(visited,0);
       free_list(queue,0);

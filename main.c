@@ -161,10 +161,11 @@ void graph_interface(){
   list_node * ln;
   int end=0, i, min_weight = 1, bfs_depth;
   clusters * clst;
+  clst = NULL;
 
   while(!end){
     if(PPRINT){
-      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n \033[1;31mGraph commands:\033[0m \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "\033[1;32ma\033[0m", "print an author and its articles",
 	     "\033[1;32mA\033[0m", "print an article and its authors",
 	     "\033[1;32mn\033[0m", "print an article and its neighbors in the article graph",
@@ -172,11 +173,12 @@ void graph_interface(){
 	     "\033[1;32mt\033[0m", "print the graph total edges",
 	     "\033[1;32mm\033[0m", "print the graph nodes' medium edges",
 	     "\033[1;32mM\033[0m", "print the graph nodes' max_edges",
-	     "\033[1;32mC\033[0m", "calculate clusters and print representatives",
+	     "\033[1;32mC\033[0m", "calculate clusters",
+	     "\033[1;32mr\033[0m", "print representatives from last calculated clusters",
 	     "\033[1;32mq\033[0m", "return to main menu");
     }
     else{
-      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
+      printf("\n Graph commands: \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n %3s \t %s \n \n: ",
 	     "a", "print an author and its articles",
 	     "A", "print an article and its authors",
 	     "n", "print an article and its neighbors in the article graph",
@@ -184,7 +186,8 @@ void graph_interface(){
 	     "t", "print the graph total edges",
 	     "m", "print the graph nodes' medium edges",
 	     "M", "print the graph nodes' max_edges",
-	     "C", "calculate clusters and print representatives",
+	     "C", "calculate clusters",
+	     "r", "print representatives from last calculated clusters",
 	     "q", "return to main menu");
     }
     scanf(" %c", &input);
@@ -236,8 +239,16 @@ void graph_interface(){
       flush_input_buffer();
       scanf("%d", &min_weight);
       clst = find_clusters(artcl_graph, min_weight);
-      for(i=0;i<clst->n_rpr;++i){
-	print_article_node(clst->representatives[i]);
+      break;
+    case 'r':
+      if(clst != NULL){
+	for(i=0;i<clst->n_rpr;++i){
+	  if(PPRINT)
+	    printf("\n \033[1;32mCluster %d has %d nodes. Representative:\033[0m", i, clst->nodes_in_cluster[i]);
+	  else
+	    printf("\n Cluster %d has %d nodes. Representative:", i, clst->nodes_in_cluster[i]);
+	  print_article_node(clst->representatives[i]);
+	}
       }
       break;
     case 'q':

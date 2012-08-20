@@ -60,6 +60,7 @@ typedef struct graph_t {
 
 typedef struct clusters_t {
   graph_node ** representatives;
+  int * nodes_in_cluster;
   int n_rpr;
   int min_weight;
 } clusters;
