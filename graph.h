@@ -46,7 +46,7 @@ struct list_t {
 /* GRAFI */
 struct graph_node_t {
   void * key;
-  short int n_neighbours;
+  unsigned short int n_neighbours;
   struct graph_node_t ** neighbours;
   char * weights;
 } __attribute__((__packed__));

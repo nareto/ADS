@@ -104,16 +104,11 @@ void add_article_to_author(article * artcl, author * athr){
 /*LISTE*/
 list * new_list(node_type nt){
   list * the_list;
-  list_node * head;
 
   the_list = (list *) malloc(sizeof(list));
 
-  head = (list_node *) malloc(sizeof(list_node));
-  head->key = NULL;
-  head->next = NULL;
-
-  the_list->head = head;
-  the_list->tail = head;
+  the_list->head = NULL;
+  the_list->tail = NULL;
   
   the_list->n_type = nt;
   the_list->length = 0;
@@ -124,43 +119,46 @@ list * new_list(node_type nt){
 void remove_list_node(list *l ,list_node *ln, int deep){
   list_node * prev_node = l->head;
 
-  if(deep > 0){
-    switch(l->n_type){
-    case article_node:
-      free_article(ln->key);
-      break;
-    case author_node:
-      free_author(ln->key);
-      break;
-    default:
-      break;
+  if(!list_is_empty(l)){
+    if(deep > 0){
+      switch(l->n_type){
+      case article_node:
+	free_article(ln->key);
+	break;
+      case author_node:
+	free_author(ln->key);
+	break;
+      default:
+	break;
+      }
     }
-  }
 
-  if(ln == l->head){
-    if(ln == l->tail){
-      ln->key = NULL;
-      ln->next = NULL;
+    if(l->length == 1){
+      free(ln);
+      l->head = NULL;
+      l->tail = NULL;
       --l->length;
       return;
     }
-    l->head=ln->next;
-    free(ln);
-  }
-  else{
-    while(prev_node->next != ln){
-      prev_node = prev_node->next;
-    }
-    if(ln == l->tail){
-      prev_node->next = NULL;
-      l->tail = prev_node;
+    else if(ln == l->head){
+      l->head=ln->next;
+      free(ln);
     }
     else{
-      prev_node->next = ln->next;
+      while(prev_node->next != ln){
+	prev_node = prev_node->next;
+      }
+      if(ln == l->tail){
+	prev_node->next = NULL;
+	l->tail = prev_node;
+      }
+      else{
+	prev_node->next = ln->next;
+      }
+      free(ln);
     }
-    free(ln);
+    --l->length;
   }
-  --l->length;
 }
 
 void free_list(list* the_list, int deep){
@@ -178,7 +176,8 @@ void free_list(list* the_list, int deep){
 }
 
 int list_is_empty(list *l){
-  if(l->length == 0 || l->head->key == NULL)
+  /* if(l->length == 0 || l->head->key == NULL) */
+  if(l->length == 0)
     return 1;
   else
     return 0;
@@ -199,7 +198,6 @@ int is_in_list(list *l, void * key){
 
 list_node * is_in_list_by_string(list *l, char * string){
   list_node * cur_node;
-  int j=0;
  
   cur_node = l->head;
   if(!list_is_empty(l)){
@@ -211,7 +209,6 @@ list_node * is_in_list_by_string(list *l, char * string){
 	if(cur_node == l->tail)
 	  return NULL;
 	cur_node = cur_node->next;
-	j++;
       }
       break;
     case author_node:
@@ -221,7 +218,6 @@ list_node * is_in_list_by_string(list *l, char * string){
 	if(cur_node == l->tail)
 	  return NULL;
 	cur_node = cur_node->next;
-	j++;
       }   
       break;
     default:
@@ -233,12 +229,14 @@ list_node * is_in_list_by_string(list *l, char * string){
 
 void list_insert_after(list * the_list, list_node *n, void * key) {
   list_node *new_node;
+  new_node = (list_node *) malloc(sizeof(list_node));
 
-  if(list_is_empty(the_list)){/*there is only the head (== tail) created by new_list*/
-    new_node = the_list->head;
+  if(list_is_empty(the_list)){
+    the_list->head = new_node;
+    the_list->tail = new_node;
+    new_node->next = NULL;
   }
   else{
-    new_node = (list_node *) malloc(sizeof(list_node));
     if(n != the_list->tail){
       new_node->next = n->next;
     }
@@ -273,25 +271,28 @@ void list_insert(list * the_list, void * key){
 void list_print(list * the_list){
   list_node *cur_node;
   cur_node = the_list->head;
-  while(1){
-    switch(the_list->n_type) {
-    case article_node:
-      article_print(cur_node->key);
-      break;
-    case author_node:
-      author_print(cur_node->key);
-      break;
-    case generic_graph_node:
-      print_article_node(cur_node->key);
-      break;
-    default:
-      break;
+
+  if(!list_is_empty(the_list)){
+    while(1){
+      switch(the_list->n_type) {
+      case article_node:
+	article_print(cur_node->key);
+	break;
+      case author_node:
+	author_print(cur_node->key);
+	break;
+      case generic_graph_node:
+	print_article_node(cur_node->key);
+	break;
+      default:
+	break;
+      }
+      if(cur_node == the_list->tail)
+	break;
+      cur_node = cur_node->next;
     }
-    if(cur_node == the_list->tail)
-      break;
-    cur_node = cur_node->next;
+    printf("\n");
   }
-  printf("\n");
 }
 
 
