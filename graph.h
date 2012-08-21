@@ -19,7 +19,7 @@ typedef struct edge_t edge;
 
 struct author_t {
   char * name;
-  list * articles;
+  unsigned int * articles_id;
   unsigned int id;
   short int n_articles;
 }__attribute__((__packed__));
@@ -56,7 +56,7 @@ typedef struct graph_node_t graph_node;
 
 typedef struct graph_t {
   node_type n_type;
-  graph_node ** nodes; /*this should hold: nodes[n]->key->id == n*/
+  graph_node ** nodes; /*this should hold: graph->nodes[n]->key->id == n*/
   unsigned int n_nodes;
 } graph;
 
@@ -66,6 +66,8 @@ typedef struct clusters_t {
   int n_rpr;
   int min_weight;
 } clusters;
+
+graph * artcl_graph;
 
 /* FUNCTIONS  */
 article * new_article(char * title, int id);

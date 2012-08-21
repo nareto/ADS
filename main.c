@@ -11,7 +11,6 @@ int line_is_blank(char * line);
 int max(int n,int m);
 
 hash_table * authors_dict;
-graph * artcl_graph;
 
 int main(int argc, char ** argv){
   FILE * inputfile;
@@ -33,12 +32,12 @@ int main(int argc, char ** argv){
 
 void read_file(FILE * inputfile){
   char * line;
-  int block_ended = 1, line_count = 0, total_lines = 0, i = 1;
+  int block_ended = 1, line_count = 0, total_lines = 0, i = 1, j;
   float next_perc;
   unsigned int next_article_id = 0, next_author_id = 0;
   article * temp_article;
   author * temp_author;
-  list_node * cur_node, * temp_author_node;
+  list_node * temp_author_node;
   graph_node * temp_gnode;
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
@@ -85,14 +84,10 @@ void read_file(FILE * inputfile){
 	else{
 	  temp_author = (author *) temp_author_node->key;
 	/*properly update the article's edges in the graph*/
-	  cur_node = temp_author->articles->head;
-	  while(1){
-	    if((article *) cur_node->key != temp_article){
-	      add_edge(temp_gnode, artcl_graph->nodes[((article *) cur_node->key)->id]); /*add edge or increase its weight*/
+	  for(j=0;j<temp_author->n_articles; ++j){
+	    if(temp_author->articles_id[j] < artcl_graph->n_nodes){ /*if there is the same author repeated twice we would be asking for an article id not yet in the graph*/
+	      add_edge(temp_gnode, artcl_graph->nodes[temp_author->articles_id[j]]); /*add edge or increase its weight*/
 	    }
-	    if(cur_node == temp_author->articles->tail)
-	      break;
-	    cur_node = cur_node->next;
 	  }
 	}
 	add_article_to_author(temp_article, temp_author);
