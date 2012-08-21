@@ -171,7 +171,6 @@ void free_list(list* the_list, int deep){
 }
 
 int list_is_empty(list *l){
-  /* if(l->length == 0 || l->head->key == NULL) */
   if(l->length == 0)
     return 1;
   else

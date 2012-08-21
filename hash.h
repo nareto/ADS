@@ -3,8 +3,6 @@
 
 #include <openssl/md5.h>
 #include "graph.h"
-/* #include <stdlib.h> */
-/* #include <string.h> */
 
 unsigned long int hashf(char * key, int modulo);
 
