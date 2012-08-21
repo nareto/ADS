@@ -404,12 +404,9 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
   list_node * cur_node;
   graph_node * cur_gn;
 
-  if(depth > -1){
-    nodes_on_level = (int*) malloc(depth*sizeof(int));
-    nodes_on_level[0]=1;
-    for(i=1;i<depth;++i)
-      nodes_on_level[i]=0;
-  }
+  nodes_on_level = (int*) malloc(2*sizeof(int));
+  nodes_on_level[0]=1;
+  nodes_on_level[1]=0;
 
   visited = new_list(generic_graph_node);
   queue = new_list(generic_graph_node);
@@ -433,8 +430,11 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
 	}
       }
       nodes_on_level[cur_level]--;
-      if(nodes_on_level[cur_level] == 0)
+      if(nodes_on_level[cur_level] == 0){
 	++cur_level;
+	nodes_on_level = (int*)realloc(nodes_on_level, (cur_level + 2)*sizeof(int));
+	nodes_on_level[cur_level + 1] = 0;
+      }
     }
   }
   free_list(visited,0);
