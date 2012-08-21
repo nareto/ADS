@@ -26,7 +26,7 @@ struct author_t {
 
 struct article_t {
   char * title;
-  list * authors;
+  author ** authors;
   unsigned int id;
   char n_authors;
 }__attribute__((__packed__));

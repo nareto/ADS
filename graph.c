@@ -7,7 +7,7 @@ article * new_article(char * the_title, int id){
   artcl->n_authors = 0;
   artcl->title = (char *) malloc((1+strlen(the_title))*sizeof(char));
   strcpy(artcl->title, the_title);
-  artcl->authors = new_list(author_node);
+  artcl->authors = (author **) malloc(sizeof(author *));
   artcl->id = id;
 
   return artcl;
@@ -28,7 +28,7 @@ author * new_author(char * name, int id){
 
 void free_article(article * artcl){
   free(artcl->title);
-  free_list(artcl->authors,0);
+  free(artcl->authors);
  }
 
 void free_author(author * athr){
@@ -37,22 +37,16 @@ void free_author(author * athr){
 }
 
 void article_print(article * artcl){
-  list_node * cur_node;
+  int i;
+
   if(artcl != NULL){
     if(PPRINT)
       printf("\n %10s %s \n %10s %d", "\033[1;33mTitle:\033[0m", artcl->title,"\033[1;33mId:\033[0m", artcl->id);
     else
       printf("\n %10s: %s \n %10s: %d", "Title", artcl->title,"Id", artcl->id);
-    if(!list_is_empty(artcl->authors)){
-      cur_node = artcl->authors->head;
-      while(1){
-	author_short_print((author *) cur_node->key);
-	if(cur_node == artcl->authors->tail)
-	  break;
-	cur_node = cur_node->next;
-      }
-      printf("\n");
-    }  
+    for(i=0;i<artcl->n_authors; ++i)
+      author_short_print(artcl->authors[i]);
+    printf("\n");
   }
 }
 
@@ -92,7 +86,8 @@ void author_short_print(author * athr){
 
 void add_author_to_article(author * athr, article * artcl){
   artcl->n_authors++;
-  list_insert(artcl->authors, athr);
+  artcl->authors = (author **) realloc(artcl->authors, artcl->n_authors*sizeof(author *));
+  artcl->authors[artcl->n_authors - 1] = athr;
 }
 
 void add_article_to_author(article * artcl, author * athr){
@@ -442,25 +437,35 @@ void print_neighbours(graph_node * gn, int depth, int min_weight){
 }
 
 void print_article_node(graph_node * gn){
-  list_node * cur_node;
+  int i;
+  author * athr;
+
   if(gn != NULL){
     if(PPRINT)
-      printf("\n %22s %s \n %22s %d \n %22s %d \n %22s(%d)", "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,"\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, "\033[1;33mAuthors\033[0m", ((article *) gn->key)->n_authors);
+      printf("\n %22s %s \n %22s %d \n %22s %d \n %22s(%d)", 
+	     "\033[1;33mTitle:\033[0m", ((article *) gn->key)->title,
+	     "\033[1;33mArticle Id:\033[0m", ((article *) gn->key)->id, 
+	     "\033[1;33mNeighbours:\033[0m", gn->n_neighbours, 
+	     "\033[1;33mAuthors\033[0m", ((article *) gn->key)->n_authors);
     else
-      printf("\n %22s: %s \n %22s: %d \n %22s: %d \n %22s(%d)", "Title", ((article *) gn->key)->title,"Article Id", ((article *) gn->key)->id, "Neighbours", gn->n_neighbours, "Authors", ((article *) gn->key)->n_authors);
-    if(!list_is_empty(((article *) gn->key)->authors)){
-      cur_node = ((article *)gn->key)->authors->head;
-      while(cur_node != NULL){
-	if(PPRINT)
-	  printf("\n \t %19s %d, %d, %s", "\033[1;33mId, Articles, Name:\033[0m",  ((author *) cur_node->key)->id,((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
-	else
-	  printf("\n \t %19s: %d, %d, %s", "Id, Articles, Name",  ((author *) cur_node->key)->id, ((author *) cur_node->key)->n_articles, ((author *) cur_node->key)->name);
-	cur_node = cur_node->next;
-      }
-      printf("\n");
-    }  
-  }
+      printf("\n %22s: %s \n %22s: %d \n %22s: %d \n %22s(%d)", 
+	     "Title", ((article *) gn->key)->title,
+	     "Article Id", ((article *) gn->key)->id, 
+	     "Neighbours", gn->n_neighbours, 
+	     "Authors", ((article *) gn->key)->n_authors);
+    for(i=0;i<((article *) gn->key)->n_authors;++i){
+      athr = ((article*)gn->key)->authors[i];
+      if(PPRINT)
+	printf("\n \t %19s %d, %d, %s", 
+	       "\033[1;33mId, Articles, Name:\033[0m", athr->id, athr->n_articles, athr->name);
+      else
+	printf("\n \t %19s: %d, %d, %s", 
+	       "Id, Articles, Name", athr->id, athr->n_articles, athr->name);
+    }
+    printf("\n");
+  }  
 }
+
 
 int total_edges(graph *g){
   long int i, te=0;
