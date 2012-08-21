@@ -399,33 +399,43 @@ void add_node_to_graph(graph_node * gn, graph * g){
 }
 
 void print_neighbours(graph_node * gn, int depth, int min_weight){
-  int i, visit_depth=0;
+  int i, cur_level=0, *nodes_on_level;
   list * queue, * visited;
   list_node * cur_node;
   graph_node * cur_gn;
+
+  if(depth > -1){
+    nodes_on_level = (int*) malloc(depth*sizeof(int));
+    nodes_on_level[0]=1;
+    for(i=1;i<depth;++i)
+      nodes_on_level[i]=0;
+  }
 
   visited = new_list(generic_graph_node);
   queue = new_list(generic_graph_node);
   list_insert(queue, gn);
 
-  while(!list_is_empty(queue) && (visit_depth < depth || depth == -1)){
+  while(!list_is_empty(queue) && (cur_level < depth + 1|| depth == -1)){
     cur_node = queue->head; /*dequeue*/
     cur_gn = (graph_node *) cur_node->key;
     remove_list_node(queue, queue->head, 0);
     if(!is_in_list(visited, cur_gn)){
       list_insert(visited, cur_gn);
       if(PPRINT)
-	printf("\n %s %d", "\033[1;33mDistance from source (hops):\033[0m", visit_depth);
+	printf("\n %s %d", "\033[1;33mDistance from source (hops):\033[0m", cur_level);
       else
-	printf("\n %s %d", "Distance from source (hops):", visit_depth);
+	printf("\n %s %d", "Distance from source (hops):", cur_level);
       print_article_node(cur_gn);      
       for(i=0; i < cur_gn->n_neighbours; ++i){
 	if(cur_gn->weights[i] >= min_weight){
+	  ++nodes_on_level[cur_level + 1];
 	  list_insert(queue, cur_gn->neighbours[i]);
 	}
       }
+      nodes_on_level[cur_level]--;
+      if(nodes_on_level[cur_level] == 0)
+	++cur_level;
     }
-    ++visit_depth;
   }
   free_list(visited,0);
   free_list(queue,0);
