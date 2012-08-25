@@ -35,10 +35,10 @@ void read_file(FILE * inputfile){
   int block_ended = 1, line_count = 0, total_lines = 0, i = 1, j;
   float next_perc;
   unsigned int next_article_id = 0, next_author_id = 0;
-  article * temp_article;
+  article * temp_article = NULL;
   author * temp_author;
   list_node * temp_author_node;
-  graph_node * temp_gnode;
+  graph_node * temp_gnode = NULL;
 
   line = (char *) malloc(MAX_LINE_LENGTH*sizeof(char));
   while(fgets(line, MAX_LINE_LENGTH, inputfile) != NULL)
